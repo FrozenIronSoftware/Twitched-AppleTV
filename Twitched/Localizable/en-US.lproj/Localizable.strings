@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  Twitched
+
+  Created by Rolando Islas on 5/13/18.
+  Copyright © 2018 Frozen Iron Software LLC. All rights reserved.
+*/
+
+/* Inline
+   Items in this group are expected to be used in the middle of a sentence. */
+
+"inline.viewers" = "viewers";
+"inline.viewers.zero" = "viewers";
+"inline.viewers.one" = "viewer";
+"inline.viewers.other" = "viewers";
+
+"inline.on" = "on";
+
+/* Button
+   Items in this group will be used as text for buttons. */
+
+"button.confirm" = "Confirm";
+"button.follow" = "Follow";
+"button.unfollow" = "Unfollow";
+
+/* Title
+   Items in this group are expected to be in title case and will generally be standalone for various elements. */
+
+"title.popular" = "Popular";
+"title.stream_offline" = "Stream Offline";
+"title.streamer_playing_game" = "%@ playing %@";
+"title.error" = "Error";
+"title.no_title" = "No Title Provided";
+"title.error.link" = "Link Failed";
+"title.link_success" = "Account Linked";
+
+/* Message
+   Items in this group should be full sentences or paragraphs. */
+
+"message.stream_offline" = "This stream is offline.";
+"message.no_description" = "No description provided.";
+
+/* Message Error
+   Items in this group should follow the message requirements, but must expect an integer formatting error code. */
+
+"message.error.api_fail" = "A network error occurred.\nError code: %d";
+"message.error.link_fail" = "An error occurred while linking a Twitch account.";
+"message.error.link_timeout" = "Account linking timed out.";
+"message.link_complete" = "A Twitch account has been linked.";
