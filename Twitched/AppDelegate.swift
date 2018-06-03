@@ -12,10 +12,14 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    @IBOutlet private weak var popularListViewController: PopularListViewController?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        return true
+    }
+
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        TwitchApi.initialize()
         return true
     }
 
@@ -34,8 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        let navigationController: NavigationController = window?.rootViewController as! NavigationController
-        navigationController.applicationDidBecomeActive()
+        TwitchApi.tryTimeLogIn()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -43,10 +46,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
+        let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"]!
+        let build = Bundle.main.infoDictionary!["CFBundleVersion"]!
+        coder.encode(version, forKey: "twitched_version")
+        coder.encode(build, forKey: "twitched_build")
         return true
     }
 
     func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
-        return true
+        let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"]! as! String
+        let build = Bundle.main.infoDictionary!["CFBundleVersion"]! as! String
+        if let savedBuild: String = coder.decodeObject(forKey: "twitched_build") as? String {
+            if let savedVersion: String = coder.decodeObject(forKey: "twitched_version") as? String {
+                return version == savedVersion && build == savedBuild
+            }
+            return false
+        }
+        return false
     }
 }

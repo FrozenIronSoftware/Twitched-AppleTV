@@ -48,7 +48,9 @@ class VideoCell: UICollectionViewCell {
                 "inline.viewers".l10n(arg: stream.viewerCount),
                 "inline.on".l10n(),
                 stream.userName != nil ? (stream.userName?.displayName)! : "")
-        setThumbnail(stream.thumbnailUrl, stream.gameName != nil ? stream.gameName! : "", 370, 227)
+        setThumbnail(stream.thumbnailUrl, stream.gameName != nil ? stream.gameName! : "",
+                Int((self.thumbnail?.bounds.width)!),
+                Int((self.thumbnail?.bounds.height)!))
     }
 
     /// Set the background thumbnail with the game cover layered on top

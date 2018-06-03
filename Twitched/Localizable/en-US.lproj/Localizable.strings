@@ -33,6 +33,10 @@
 "title.no_title" = "No Title Provided";
 "title.error.link" = "Link Failed";
 "title.link_success" = "Account Linked";
+"title.error.video_fail" = "Video Error";
+"title.archived_videos" = "Past Broadcasts";
+"title.highlighted_videos" = "Highlights";
+"title.videos" = "Videos";
 
 /* Message
    Items in this group should be full sentences or paragraphs. */
@@ -46,4 +50,5 @@
 "message.error.api_fail" = "A network error occurred.\nError code: %d";
 "message.error.link_fail" = "An error occurred while linking a Twitch account.";
 "message.error.link_timeout" = "Account linking timed out.";
+"message.error.video_fail" = "An error occurred while attempting to play a video.";
 "message.link_complete" = "A Twitch account has been linked.";

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="14109" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="14113" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="appleTV" orientation="landscape">
         <adaptation id="light"/>
     </device>
@@ -40,7 +40,7 @@
                                     <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </variation>
                             </label>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" tag="1" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="collectionView" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="fac-oT-3gH" userLabel="collectionView">
+                            <collectionView multipleTouchEnabled="YES" tag="1" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="collectionView" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="fac-oT-3gH" userLabel="collectionView">
                                 <rect key="frame" x="90" y="60" width="1740" height="960"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -112,7 +112,7 @@
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
-                                <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="header" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="header" id="a3F-Yh-63i" userLabel="header" customClass="TextHeader" customModule="Twitched" customModuleProvider="target">
+                                <collectionReusableView key="sectionHeaderView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="header" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="header" id="a3F-Yh-63i" userLabel="header" customClass="TextHeader" customModule="Twitched" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="1740" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
@@ -301,7 +301,7 @@
                                                     <color key="value" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </userDefinedRuntimeAttribute>
                                                 <userDefinedRuntimeAttribute type="number" keyPath="minimumFontScale">
-                                                    <real key="value" value="0.5"/>
+                                                    <real key="value" value="0.75"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
@@ -395,6 +395,12 @@
                                                 <userDefinedRuntimeAttribute type="color" keyPath="focusedBackgroundEndColor">
                                                     <color key="value" red="0.078431372550000003" green="0.72156862749999995" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                                 </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="color" keyPath="selectedBackgroundColor">
+                                                    <color key="value" red="0.078431372550000003" green="0.72156862749999995" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                </userDefinedRuntimeAttribute>
+                                                <userDefinedRuntimeAttribute type="color" keyPath="selectedBackgroundEndColor">
+                                                    <color key="value" red="0.078431372550000003" green="0.72156862749999995" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                             <connections>
                                                 <action selector="followButtonSelected:" destination="Hlz-lG-xla" eventType="primaryActionTriggered" id="0yl-qR-RFs"/>
@@ -426,6 +432,101 @@
                                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </variation>
                                         </label>
+                                        <tableView contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="tableView" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="360" sectionHeaderHeight="66" sectionFooterHeight="66" translatesAutoresizingMaskIntoConstraints="NO" id="Orn-Sb-ESf" userLabel="tableView">
+                                            <rect key="frame" x="90" y="562" width="1740" height="520"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <color key="separatorColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <color key="sectionIndexTrackingBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <prototypes>
+                                                <tableViewCell contentMode="scaleToFill" misplaced="YES" restorationIdentifier="collectionViewCell" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="collectionViewCell" focusStyle="custom" rowHeight="360" id="h5V-AY-n71" userLabel="collectionViewCell" customClass="VideoCollectionCell" customModule="Twitched" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="66" width="1740" height="360"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="contentView" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="h5V-AY-n71" id="QHB-jT-Im3" userLabel="contentView">
+                                                        <rect key="frame" x="0.0" y="0.0" width="1740" height="360"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="contentTitle" text="Past Broadcasts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1XV-FQ-GsB" userLabel="contentTitle">
+                                                                <rect key="frame" x="0.0" y="0.0" width="1740" height="46"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                                <nil key="textColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <collectionView multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="collectionView" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Dit-mI-QsR" userLabel="collectionView">
+                                                                <rect key="frame" x="0.0" y="60" width="1740" height="300"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="30" minimumInteritemSpacing="10" id="kVG-MT-co5">
+                                                                    <size key="itemSize" width="390" height="300"/>
+                                                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                                </collectionViewFlowLayout>
+                                                                <cells>
+                                                                    <collectionViewCell opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="videoCell" reuseIdentifier="videoCell" id="Yai-Dn-ZrG" userLabel="videoCell" customClass="VideoOnDemandCell" customModule="Twitched" customModuleProvider="target">
+                                                                        <rect key="frame" x="0.0" y="0.0" width="390" height="300"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                                                            <rect key="frame" x="0.0" y="0.0" width="390" height="300"/>
+                                                                            <autoresizingMask key="autoresizingMask"/>
+                                                                            <subviews>
+                                                                                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="videoThumbnail" image="Video Thumbnail Loading Image" adjustsImageWhenAncestorFocused="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l9h-DL-yaT" userLabel="videoThumbnail">
+                                                                                    <rect key="frame" x="10" y="10" width="370" height="227"/>
+                                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                                </imageView>
+                                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="videoTitle" text="Yogcinema!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P16-Sf-PTx" userLabel="videoTitle" customClass="MarqueeLabel" customModule="Twitched" customModuleProvider="target">
+                                                                                    <rect key="frame" x="10" y="255" width="370" height="45"/>
+                                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="30"/>
+                                                                                    <nil key="textColor"/>
+                                                                                    <nil key="highlightedColor"/>
+                                                                                    <userDefinedRuntimeAttributes>
+                                                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="labelize" value="YES"/>
+                                                                                        <userDefinedRuntimeAttribute type="number" keyPath="scrollDuration">
+                                                                                            <real key="value" value="8"/>
+                                                                                        </userDefinedRuntimeAttribute>
+                                                                                        <userDefinedRuntimeAttribute type="number" keyPath="fadeLength">
+                                                                                            <real key="value" value="10"/>
+                                                                                        </userDefinedRuntimeAttribute>
+                                                                                    </userDefinedRuntimeAttributes>
+                                                                                    <variation key="userInterfaceStyle=dark">
+                                                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                    </variation>
+                                                                                    <variation key="userInterfaceStyle=light">
+                                                                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                    </variation>
+                                                                                </label>
+                                                                            </subviews>
+                                                                        </view>
+                                                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                        <size key="customSize" width="390" height="300"/>
+                                                                        <connections>
+                                                                            <outlet property="thumbnail" destination="l9h-DL-yaT" id="tmr-8g-pxC"/>
+                                                                            <outlet property="title" destination="P16-Sf-PTx" id="ptE-iW-EHH"/>
+                                                                        </connections>
+                                                                    </collectionViewCell>
+                                                                </cells>
+                                                                <connections>
+                                                                    <outlet property="dataSource" destination="h5V-AY-n71" id="biQ-gm-jhN"/>
+                                                                    <outlet property="delegate" destination="h5V-AY-n71" id="OCh-PB-kKs"/>
+                                                                </connections>
+                                                            </collectionView>
+                                                        </subviews>
+                                                    </tableViewCellContentView>
+                                                    <connections>
+                                                        <outlet property="collectionView" destination="Dit-mI-QsR" id="dnb-BO-vWt"/>
+                                                        <outlet property="title" destination="1XV-FQ-GsB" id="mPB-jb-EPs"/>
+                                                    </connections>
+                                                </tableViewCell>
+                                            </prototypes>
+                                            <sections/>
+                                            <connections>
+                                                <outlet property="dataSource" destination="Hlz-lG-xla" id="71b-im-Tp8"/>
+                                                <outlet property="delegate" destination="Hlz-lG-xla" id="uIQ-ga-n38"/>
+                                            </connections>
+                                        </tableView>
                                     </subviews>
                                     <accessibility key="accessibilityConfiguration">
                                         <accessibilityTraits key="traits" notEnabled="YES"/>
@@ -447,6 +548,7 @@
                         <outlet property="previewImage" destination="myP-Qd-8En" id="WNB-zU-Uad"/>
                         <outlet property="previewImageContainerView" destination="clQ-47-qtp" id="xki-TN-ezU"/>
                         <outlet property="streamerLabel" destination="yUX-oa-9kJ" id="ZUv-b2-DQc"/>
+                        <outlet property="tableView" destination="Orn-Sb-ESf" id="eQ0-JN-dNc"/>
                         <outlet property="titleLabel" destination="5s1-uL-NFU" id="sWu-ip-X7n"/>
                         <outlet property="viewersLabel" destination="VfE-cv-kmM" id="FKF-di-pd3"/>
                         <outlet property="viewersTitleLable" destination="rYY-HG-yGD" id="7hM-AV-apf"/>

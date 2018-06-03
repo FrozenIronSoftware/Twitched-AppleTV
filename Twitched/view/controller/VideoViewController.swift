@@ -8,11 +8,10 @@ import AVKit
 import AVFoundation
 import os.log
 
-class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, ResettingViewController {
+class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
 
     @IBOutlet private weak var loadingIndicator: UIActivityIndicatorView?
     @IBOutlet private weak var titleLabel: UILabel?
-    private var twitchApi: TwitchApi?
     private var idType: TwitchApi.VideoType?
     private var id: String?
     private var titleMeta: String?
@@ -20,12 +19,38 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
     private var loadingTitle: String?
     private var thumbnail: UIImage?
     private var thumbnailUrl: String?
+    private var player: AVPlayer?
 
     /// Loaded
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.twitchApi = TwitchApi()
         self.titleLabel?.text = loadingTitle
+    }
+
+    /// Will appear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
+                name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
+    @objc func applicationDidBecomeActive() {
+        os_log("VideoViewController: active", type: .debug)
+    }
+
+    /// Disappear
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        if let player = player {
+            player.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status))
+            if let item = player.currentItem {
+                item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status))
+            }
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: player)
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: player)
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: player)
+        }
     }
 
     /// Appeared
@@ -39,14 +64,14 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
         if let id: String = id, let idType: TwitchApi.VideoType = idType {
             switch idType {
                 case .STREAM:
-                    twitchApi?.getStreams(parameters: [
+                    TwitchApi.getStreams(parameters: [
                         "user_id": id
                     ], callback: { response in
                         if let streams: Array<TwitchStream> = response {
                             if streams.count == 1 {
                                 let stream: TwitchStream = streams[0]
                                 if stream.online {
-                                    let hlsUrl: String = (self.twitchApi?.getHlsUrl(type: .STREAM, id: stream.userId))!
+                                    let hlsUrl: String = TwitchApi.getHlsUrl(type: .STREAM, id: stream.userId)
                                     self.fetchThumbnailThenPlayVideo(hlsUrl)
                                 }
                                 else {
@@ -64,7 +89,8 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
                         }
                     })
                 case .VIDEO:
-                    print("todo")
+                    let hlsUrl: String = TwitchApi.getHlsUrl(type: .VIDEO, id: id)
+                    self.fetchThumbnailThenPlayVideo(hlsUrl)
             }
         }
     }
@@ -77,6 +103,11 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
     /// Shows an offline alert that dismisses this controller when exited
     private func showOfflineAlert() {
         showAlert(title: "title.stream_offline", message: "message.stream_offline")
+    }
+
+    /// Show a video error alert
+    private func showVideoErrorAlert() {
+        showAlert(title: "title.error.video_fail", message: "message.error.video_fail")
     }
 
     /// Show an alert that dismisses this presented view
@@ -111,7 +142,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
     private func playVideo(_ url: String) {
         let playerAsset: AVURLAsset =  AVURLAsset(url: URL(
                 string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!, options: [
-            "AVURLAssetHTTPHeaderFieldsKey": twitchApi?.generateHeaders() as Any
+            "AVURLAssetHTTPHeaderFieldsKey": TwitchApi.generateHeaders() as Any
         ])
         let playerItem: AVPlayerItem = AVPlayerItem(asset: playerAsset)
         playerItem.externalMetadata = generateMetadata()
@@ -127,7 +158,69 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
         self.view.addSubview(playerViewController.view)
         playerViewController.didMove(toParentViewController: self)
         playerViewController.delegate = self
+        // Add observers
+        self.player = player
+        player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: .new, context: nil)
+        playerItem.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: .new, context: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleVideoError),
+                name: .AVPlayerItemNewErrorLogEntry, object: player)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleVideoError),
+                name: .AVPlayerItemFailedToPlayToEndTime, object: player)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleVideoFinish),
+                name: .AVPlayerItemDidPlayToEndTime, object: player)
         player.play()
+    }
+
+    /// Handle video finish
+    @objc func handleVideoFinish() {
+        self.dismiss(animated: true)
+    }
+
+    /// Handle a video error
+    @objc func handleVideoError() {
+        if let idType = self.idType {
+            switch idType {
+            case .VIDEO:
+                showVideoErrorAlert()
+            case .STREAM:
+                showOfflineAlert()
+            }
+        }
+        else {
+            dismiss(animated: false)
+        }
+    }
+
+    // Observe value changes
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?,
+                               context: UnsafeMutableRawPointer?) {
+        if keyPath == #keyPath(AVPlayerItem.status) || keyPath == #keyPath(AVPlayer.status) {
+            if let change = change {
+                if let statusRawValue: Int = change[.newKey] as? Int {
+                    if let status: AVPlayerStatus = AVPlayerStatus(rawValue: statusRawValue) {
+                        handleVideoStatusChange(status)
+                    }
+                    else if let status: AVPlayerItemStatus = AVPlayerItemStatus(rawValue: statusRawValue) {
+                        handleVideoItemStatusChange(status)
+                    }
+                }
+            }
+        }
+    }
+
+    /// Handle the player item status change
+    private func handleVideoItemStatusChange(_ status: AVPlayerItemStatus) {
+        switch status {
+            case .failed, .unknown:
+                handleVideoError()
+            case .readyToPlay:
+                break
+        }
+    }
+
+    /// Handle the player's status change
+    private func handleVideoStatusChange(_ status: AVPlayerStatus) {
+        handleVideoItemStatusChange(AVPlayerItemStatus(rawValue: status.rawValue)!)
     }
 
     /// Set thumbnail url
@@ -181,11 +274,6 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
         return metadata
     }
 
-    /// Activated
-    func applicationDidBecomeActive() {
-        os_log("VideoViewController active", type: .debug)
-    }
-
     /// Set the metadata title
     func setTitle(_ title: String) {
         self.titleMeta = title
@@ -195,5 +283,10 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate, Res
     func setId(type: TwitchApi.VideoType, _ id: String) {
         self.idType = type
         self.id = id
+    }
+
+    override func restoreUserActivityState(_ activity: NSUserActivity) {
+        super.restoreUserActivityState(activity)
+        showApiErrorAlert()
     }
 }

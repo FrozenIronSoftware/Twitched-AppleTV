@@ -11,12 +11,10 @@ import Alamofire
 import os.log
 import L10n_swift
 
-class PopularListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,
-        ResettingViewController {
+class PopularListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     private let UPDATE_INTERVAL: TimeInterval = 60 * 10
     private let MAX_PAGE: Int = 10
-    private var twitchApi: TwitchApi?
     @IBOutlet private weak var collectionView: UICollectionView?
     @IBOutlet private weak var messageLabel: UILabel?
     @IBOutlet private weak var loadingIndicator: UIActivityIndicatorView?
@@ -24,6 +22,7 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
     private var streams: Array<TwitchStream>?
     private var page: Int?
     private var isLoading: Bool?
+    private var initialHeaderBounds: CGRect?
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
@@ -32,6 +31,36 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
         os_log("PopularListView will appear", type: .debug)
         if lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL {
             populateCollectionViewWithReset()
+        }
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
+                name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
+    /// Disappear
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
+    // Appeared
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Save initial header position
+        if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+                at: IndexPath(item: 0, section: 0)) {
+            self.initialHeaderBounds = header.bounds
+        }
+    }
+
+    /// Disappeared
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        // Reset header position
+        if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+                at: IndexPath(item: 0, section: 0)) {
+            if let bounds = self.initialHeaderBounds {
+                header.bounds = bounds
+            }
         }
     }
 
@@ -47,8 +76,9 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         os_log("PopularListView loaded", type: .debug)
-        twitchApi = TwitchApi()
         populateCollectionViewWithReset()
+        // Save header location
+
     }
 
     /// Retrieves stream data from the API and populates the collection view
@@ -67,7 +97,7 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
             "limit": 40,
             "offset": offset!
         ]
-        twitchApi?.getStreams(parameters: params, callback: { response in
+        TwitchApi.getStreams(parameters: params, callback: { response in
             if let streams: Array<TwitchStream> = response {
                 self.lastUpdateTime = Date().timeIntervalSince1970
                 if (!append!) || self.streams == nil {
@@ -142,7 +172,24 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
     func collectionView(_ collectionView: UICollectionView,
                         didUpdateFocusIn context: UICollectionViewFocusUpdateContext,
                         with coordinator: UIFocusAnimationCoordinator) {
-
+        // Move the header title if the cell focused is the first item
+        if let indexPath = context.nextFocusedIndexPath {
+            if let header = collectionView.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+                    at: IndexPath(item: 0, section: 0)) {
+                if indexPath.section == 0 && indexPath.item == 0 {
+                    UIView.animate(withDuration: 0.2, animations: {
+                        header.bounds = (self.initialHeaderBounds?.offsetBy(dx: 1, dy: 20))!
+                    })
+                }
+                else if let previousIndexPath = context.previouslyFocusedIndexPath {
+                    if previousIndexPath.section == 0 && previousIndexPath.item == 0 {
+                        UIView.animate(withDuration: 0.2, animations: {
+                            header.bounds = self.initialHeaderBounds!
+                        })
+                    }
+                }
+            }
+        }
     }
 
     /// Handle item pre-focus
@@ -156,6 +203,15 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
                            page! < MAX_PAGE {
                     page? += 1
                     populateCollectionView(offset: page, append: true)
+                }
+            }
+        }
+        // Reset the header title if the focus is not a video cell
+        else {
+            if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+                    at: IndexPath(item: 0, section: 0)) {
+                if let bounds = self.initialHeaderBounds {
+                    header.bounds = bounds
                 }
             }
         }
@@ -174,7 +230,7 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
 
 
     /// Handle the application and this view resuming
-    func applicationDidBecomeActive() {
+    @objc func applicationDidBecomeActive() {
         os_log("PopularListView active", type: .debug)
         // Update the items if needed
         if lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL {
@@ -184,10 +240,6 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
         for cell in (collectionView?.visibleCells)! {
             let cell: VideoCell = cell as! VideoCell
             cell.setFocused(cell.isFocused)
-        }
-        // Propagate to the presented view
-        if let presentedView: ResettingViewController = self.presentedViewController as? ResettingViewController {
-            presentedView.applicationDidBecomeActive()
         }
     }
 }

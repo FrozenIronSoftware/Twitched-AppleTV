@@ -10,13 +10,14 @@ import CloudKit
 
 class TwitchApi {
 
-    private let API_HELIX: String
-    private let API_KRAKEN: String
-    private let API: String
-    private let CLIENT_ID: String
+    private static var API_HELIX: String = ""
+    private static var API_KRAKEN: String = ""
+    private static var API: String = ""
+    private static var CLIENT_ID: String = ""
     private static let GAME_THUMBNAIL_URL: String = "https://static-cdn.jtvnw.net/ttv-boxart/%@-%@x%@.jpg"
     private static let ACCESS_TOKEN_KEY: String = "auth.access_token"
-    var isLoggedIn: Bool {
+    private static let LOGIN_INTERVAL: TimeInterval = 60 * 60 // One hour
+    static var isLoggedIn: Bool {
         get {
             return TwitchApi.tokenValidation != nil && TwitchApi.accessToken != nil
         }
@@ -33,9 +34,13 @@ class TwitchApi {
             }
         }
     }
+    private static var lastLoginTime: TimeInterval = 0
+
+    /// Static only class
+    private init() {}
 
     /// Request a link ID from the API
-    func requestLinkCode(callback: @escaping (TwitchedLinkId?) -> Void) {
+    static func requestLinkCode(callback: @escaping (TwitchedLinkId?) -> Void) {
         let url: String = API + "/link"
         os_log("Get request to %{public}@", url)
         request(url, parameters: [
@@ -62,8 +67,15 @@ class TwitchApi {
         }
     }
 
+    /// Check the last login time and verify the token
+    static func tryTimeLogIn() {
+        if !isLoggedIn || Date().timeIntervalSince1970 - lastLoginTime >= LOGIN_INTERVAL {
+            log_in(invalidate: false)
+        }
+    }
+
     /// Request the link status
-    func getLinkStatus(callback: @escaping (LinkStatus) -> Void) {
+    static func getLinkStatus(callback: @escaping (LinkStatus) -> Void) {
         let url: String = API + "/link/status"
         os_log("Get request to %{public}@", url)
         request(url, parameters: [
@@ -114,8 +126,8 @@ class TwitchApi {
     }
 
     /// Initialize the Twitch API
-    /// Loads the config from secret.json
-    init() {
+    /// Loads the config from secret.json and attempts to login
+    static func initialize() {
         os_log("TwitchApi initialized", type: .debug)
         // Read client configuration
         if let configFile: String = Bundle.main.path(forResource: "secret", ofType: "json") {
@@ -137,15 +149,20 @@ class TwitchApi {
             exit(EXIT_FAILURE)
         }
         // Read stored credentials
-        log_in()
+        if !isLoggedIn {
+            log_in()
+        }
     }
 
     /// Attempts to log in using stored credentials
-    private func log_in() {
+    /// @param invalid Bool Should the
+    private static func log_in(invalidate: Bool = true) {
         os_log("Attempting to log in", type: .debug)
         let cloud = NSUbiquitousKeyValueStore.default
-        TwitchApi.accessToken = nil
-        TwitchApi.tokenValidation = nil
+        if invalidate {
+            TwitchApi.accessToken = nil
+            TwitchApi.tokenValidation = nil
+        }
         if let accessTokenData: Data = cloud.data(forKey: TwitchApi.ACCESS_TOKEN_KEY) {
             do {
                 let accessToken = try JSONDecoder().decode(TwitchAccessToken.self, from: accessTokenData)
@@ -193,8 +210,33 @@ class TwitchApi {
         }
     }
 
+    /// Request videos
+    class func getVideos(parameters: Parameters, callback: @escaping (Array<TwitchStream>?) -> Void) {
+        let url: String = API_HELIX + "/videos"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    let data: Array<TwitchStream> = try JSONDecoder().decode(Array<TwitchStream>.self,
+                            from: response.result.value!)
+                    callback(data)
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@",
+                            url,
+                            response.result.value.debugDescription)
+                    callback(nil)
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(nil)
+            }
+        }
+    }
+
     /// Save access token
-    private func saveAccessToken() {
+    private static func saveAccessToken() {
         if let accessToken = TwitchApi.accessToken {
             let cloud = NSUbiquitousKeyValueStore.default
             do {
@@ -209,8 +251,8 @@ class TwitchApi {
     }
 
     /// Call the token refresh endpoint
-    private func refreshToken(parameters: Parameters, callback: @escaping (TwitchAccessToken?) -> Void) {
-        let url: String = API + "/link/refresh"
+    private static func refreshToken(parameters: Parameters, callback: @escaping (TwitchAccessToken?) -> Void) {
+        let url: String = TwitchApi.API + "/link/refresh"
         os_log("Get request to %{public}@", url)
         request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
             switch response.result {
@@ -234,7 +276,7 @@ class TwitchApi {
     }
 
     /// Call the token validation endpoint
-    private func validateToken(callback: @escaping (TwitchTokenValidation?) -> Void) {
+    private static func validateToken(callback: @escaping (TwitchTokenValidation?) -> Void) {
         let url: String = API + "/link/validate"
         os_log("Get request to %{public}@", url)
         request(url, headers: generateHeaders()).validate().responseData { response in
@@ -264,7 +306,7 @@ class TwitchApi {
     }
 
     /// Send a request to follow a user
-    func followUser(id: String, callback: @escaping (Bool) -> Void) {
+    static func followUser(id: String, callback: @escaping (Bool) -> Void) {
         let url: String = API_KRAKEN + "/users/follows/follow"
         os_log("Get request to %{public}@", url)
         request(url, parameters: [
@@ -281,7 +323,7 @@ class TwitchApi {
     }
 
     /// Get HLS url for a stream
-    func getHlsUrl(type: VideoType, id: String) -> String {
+    static func getHlsUrl(type: VideoType, id: String) -> String {
         switch type {
             case .STREAM:
                 return String(format: "%@/twitch/hls/60/1080p/ATV/:%@.m3u8", arguments: [API, id])
@@ -291,7 +333,7 @@ class TwitchApi {
     }
 
     /// Call the follows endpoint
-    func getFollows(parameters: Parameters, callback: @escaping (Array<TwitchUserFollow>?) -> Void) {
+    static func getFollows(parameters: Parameters, callback: @escaping (Array<TwitchUserFollow>?) -> Void) {
         let url: String = API_HELIX + "/users/follows"
         os_log("Get request to %{public}@", url)
         request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
@@ -321,7 +363,7 @@ class TwitchApi {
     }
 
     /// Request stream data from the API
-    func getStreams(parameters: Parameters, callback: @escaping (Array<TwitchStream>?) -> Void) {
+    static func getStreams(parameters: Parameters, callback: @escaping (Array<TwitchStream>?) -> Void) {
         let url: String = API_HELIX + "/streams"
         os_log("Get request to %{public}@", url)
         request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
@@ -346,7 +388,7 @@ class TwitchApi {
     }
 
     /// Generate headers with Twitched client ID and Twitch user OAuth token (if the token is available)
-    func generateHeaders() -> HTTPHeaders {
+    static func generateHeaders() -> HTTPHeaders {
         var headers: HTTPHeaders = [
             "Client-ID": CLIENT_ID,
             "X-Twitched-Version": Constants.VERSION
@@ -360,7 +402,7 @@ class TwitchApi {
     }
 
     /// Request users from the API
-    func getUsers(parameters: Parameters, callback: @escaping (Array<TwitchUser>?) -> Void) {
+    static func getUsers(parameters: Parameters, callback: @escaping (Array<TwitchUser>?) -> Void) {
         let url: String = API_HELIX + "/users"
         os_log("Get request to %{public}@", url)
         request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in

@@ -64,8 +64,8 @@ class ImageUtil {
 extension UIImageView {
     /// Attempt to set the image to the one contained at the URL
     /// This performs an async request and will set the image to an error placeholder if an error is encountered
-    func setUrl(_ url: String, errorImageName: String? = nil) {
-        request(url).responseData { response in
+    func setUrl(_ url: String, errorImageName: String? = nil) -> DataRequest {
+        return request(url).responseData { response in
             if let data = response.result.value {
                 let image = UIImage(data: data)
                 self.image = image

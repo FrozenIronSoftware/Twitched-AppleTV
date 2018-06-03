@@ -5,13 +5,5 @@
 
 import UIKit
 
-class NavigationController: UITabBarController, ResettingViewController {
-    func applicationDidBecomeActive() {
-        for viewController in self.childViewControllers {
-            if viewController is ResettingViewController && viewController.isViewLoaded {
-                let viewController: ResettingViewController = viewController as! ResettingViewController
-                viewController.applicationDidBecomeActive()
-            }
-        }
-    }
+class NavigationController: UITabBarController {
 }

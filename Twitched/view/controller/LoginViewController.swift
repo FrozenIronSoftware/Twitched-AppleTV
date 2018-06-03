@@ -7,12 +7,11 @@ import UIKit
 import os.log
 import L10n_swift
 
-class LoginViewController: UIViewController, ResettingViewController {
+class LoginViewController: UIViewController {
 
     @IBOutlet private weak var loadingIndicator: UIActivityIndicatorView?
     @IBOutlet private weak var linkCodeLabel: UILabel?
 
-    private var twitchApi: TwitchApi?
     private var isRequestingStatus: Bool?
     private var statusTimer: Timer?
 
@@ -20,18 +19,30 @@ class LoginViewController: UIViewController, ResettingViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         os_log("LoginViewController did load", type: .debug)
-        twitchApi = TwitchApi()
         statusTimer = Timer(timeInterval: 5, target: self, selector: #selector(self.checkLinkStatus(sender:)),
                 userInfo: nil, repeats: true)
         isRequestingStatus = false
         requestLink()
     }
 
+    /// Will appear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
+                name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
+    /// Disappear
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
     /// Check link status
     @objc private func checkLinkStatus(sender: Any) {
         if !self.isRequestingStatus! {
             self.isRequestingStatus = true
-            self.twitchApi?.getLinkStatus(callback: { response in
+            TwitchApi.getLinkStatus(callback: { response in
                 switch response {
                 case .WAITING:
                     break
@@ -50,7 +61,7 @@ class LoginViewController: UIViewController, ResettingViewController {
 
     /// Begin the link process
     private func requestLink() {
-        twitchApi?.requestLinkCode(callback: { response in
+        TwitchApi.requestLinkCode(callback: { response in
             if let linkId: TwitchedLinkId = response {
                 // Show link id
                 self.loadingIndicator?.stopAnimating()
@@ -90,7 +101,7 @@ class LoginViewController: UIViewController, ResettingViewController {
     }
 
     /// Handle application becoming active
-    func applicationDidBecomeActive() {
+    @objc func applicationDidBecomeActive() {
         os_log("LoginViewController active", type: .debug)
     }
 

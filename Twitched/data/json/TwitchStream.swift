@@ -27,7 +27,7 @@ struct TwitchStream: Codable {
         }
     }
     var viewerCount: Int
-    var startedAt: String
+    var startedAt: String?
     var language: String
     var thumbnailUrl: String
 

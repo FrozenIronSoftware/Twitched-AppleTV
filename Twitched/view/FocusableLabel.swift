@@ -6,7 +6,7 @@
 import UIKit
 
 @IBDesignable
-class FocusableLabel: UIControl, ResettingViewController {
+class FocusableLabel: UIControl {
 
     @IBInspectable public var selectedBackgroundColor: UIColor = .clear
     @IBInspectable public var fontSize: CGFloat = 30 {
@@ -40,7 +40,7 @@ class FocusableLabel: UIControl, ResettingViewController {
         }
     }
 
-    private var label: UILabel?
+    private var label: MarqueeLabel?
     var text: String = "" {
         didSet{
             label?.text = self.text
@@ -57,13 +57,14 @@ class FocusableLabel: UIControl, ResettingViewController {
         super.awakeFromNib()
         // Init
         self.backgroundColor = .clear
-        label = UILabel()
+        label = MarqueeLabel()
         label?.frame = self.bounds
         label?.font = UIFont(name: self.fontName, size: self.fontSize)
         label?.textAlignment = NSTextAlignment(rawValue: self.textAlignHorizontal)!
         label?.minimumScaleFactor = self.minimumFontScale
         label?.adjustsFontSizeToFitWidth = true
         label?.allowsDefaultTighteningForTruncation = true
+        label?.labelize = true
         setTextColorStyle()
         addSubview(label!)
         // Setup tap recognizer
@@ -71,6 +72,14 @@ class FocusableLabel: UIControl, ResettingViewController {
                 action: #selector(self.selected(sender:)))
         tapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
         self.addGestureRecognizer(tapRecognizer)
+        // Application active event
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
+                name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
+    override func removeFromSuperview() {
+        super.removeFromSuperview()
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
     }
 
     override func draw(_ rect: CGRect) {
@@ -108,6 +117,8 @@ class FocusableLabel: UIControl, ResettingViewController {
                 self.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
                 self.label?.transform = CGAffineTransform(scaleX: 0.9, y: 1)
             })
+            self.label?.labelize = false
+            self.label?.restartLabel()
         }
         else {
             coordinator.addCoordinatedAnimations({
@@ -115,26 +126,34 @@ class FocusableLabel: UIControl, ResettingViewController {
                 self.transform = CGAffineTransform(scaleX: 1, y: 1)
                 self.label?.transform = CGAffineTransform(scaleX: 1, y: 1)
             })
+            self.label?.labelize = true
+            self.label?.restartLabel()
         }
     }
 
     /// Handle the application becoming active
-    func applicationDidBecomeActive() {
+    @objc func applicationDidBecomeActive() {
         setTextColorStyle()
     }
 
     /// Set text color based on UI style
     private func setTextColorStyle() {
         DispatchQueue.global(qos: .background).async {
-            while self.traitCollection.userInterfaceStyle == UIUserInterfaceStyle.unspecified {}
-            DispatchQueue.main.async {
-                if self.traitCollection.userInterfaceStyle == UIUserInterfaceStyle.light {
-                    self.label?.textColor = self.textColorLightUi
-                }
-                else {
-                    self.label?.textColor = self.textColorDarkUi
+            var setColorStyle: Bool = false
+            repeat {
+                DispatchQueue.main.async {
+                    if self.traitCollection.userInterfaceStyle != UIUserInterfaceStyle.unspecified {
+                        setColorStyle = true
+                        if self.traitCollection.userInterfaceStyle == UIUserInterfaceStyle.light {
+                            self.label?.textColor = self.textColorLightUi
+                        }
+                        else {
+                            self.label?.textColor = self.textColorDarkUi
+                        }
+                    }
                 }
             }
+            while !setColorStyle
         }
     }
 }

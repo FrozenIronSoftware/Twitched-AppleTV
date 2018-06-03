@@ -8,8 +8,9 @@ import os.log
 import Alamofire
 import L10n_swift
 
-class StreamInfoViewController: UIViewController, UIScrollViewDelegate, ResettingViewController {
-
+class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableViewDelegate,
+        UITableViewDataSource {
+    private let MAX_VIDEO_PAGES: Int = 8
     @IBOutlet private weak var backgroundImage: UIImageView?
     @IBOutlet private weak var blurView: UIVisualEffectView?
     @IBOutlet private weak var titleLabel: UILabel?
@@ -22,18 +23,30 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     @IBOutlet private weak var descriptionTextView: FocusableTextView?
     @IBOutlet private weak var followButton: FocusTvButton?
     @IBOutlet private weak var followButtonLabel: UILabel?
-    private var twitchApi: TwitchApi?
+    @IBOutlet private weak var tableView: UITableView?
     private var stream: TwitchStream?
     private var user: TwitchUser?
+    private var archivedVideos: Array<TwitchStream>?
+    private var highlightedVideos: Array<TwitchStream>?
+    private var archivedVideosCursor: Int = 0
+    private var highlightedVideosCursor: Int = 0
+    private var requestingArchivedVideos: Bool = false
+    private var requestingHighlightedVideos: Bool = false
 
     /// Handle view loading
     override func viewDidLoad() {
         super.viewDidLoad()
         os_log("StreamInfoViewController did load", type: .debug)
-        twitchApi = TwitchApi()
         setBackgroundColorStyle()
         setFieldData()
         addActionEvents()
+    }
+
+    /// Will appear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
+                name: .UIApplicationDidBecomeActive, object: nil)
     }
 
     /// Handle the view appearing
@@ -46,10 +59,11 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         backgroundImage?.image = nil
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
     }
 
     /// Handle the presented controller being dismissed
-    override func dismiss(animated flag: Bool, completion: (() -> Void)?) {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         super.dismiss(animated: flag, completion: completion)
     }
 
@@ -84,8 +98,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
                 descriptionTextView?.text = ""
             }
             // Thumbnail
-            previewImage?.setUrl(stream.thumbnailUrl.replacingOccurrences(of: "{width}", with: "825")
-                    .replacingOccurrences(of: "{height}", with: "464"),
+            let _ = previewImage?.setUrl(stream.thumbnailUrl.replacingOccurrences(of: "{width}",
+                            with: String(Int((self.previewImage?.bounds.width)!)))
+                    .replacingOccurrences(of: "{height}", with: String(Int((self.previewImage?.bounds.height)!))),
                     errorImageName: Constants.IMAGE_ERROR_VIDEO_THUMBNAIL)
         }
     }
@@ -118,16 +133,26 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     }
 
     /// Load the video view
-    private func loadVideoView() {
-        if let stream: TwitchStream = stream {
+    private func loadVideoView(_ stream: TwitchStream? = nil, _ type: TwitchApi.VideoType = .STREAM) {
+        var _stream = stream
+        if _stream == nil {
+            _stream = self.stream
+        }
+        if let stream: TwitchStream = _stream {
             let videoViewController: VideoViewController = self.storyboard?.instantiateViewController(
                     withIdentifier: "videoViewController") as! VideoViewController
-            videoViewController.setId(type: .STREAM, stream.userId)
+            switch type {
+                case .STREAM:
+                    videoViewController.setId(type: .STREAM, stream.userId)
+                    videoViewController.setSubTitle("title.streamer_playing_game".l10nf(arg: [
+                        stream.userName != nil ? (stream.userName?.displayName)! : "",
+                        stream.gameName != nil ? stream.gameName! : ""
+                    ]))
+                case .VIDEO:
+                    videoViewController.setId(type: .VIDEO, stream.id)
+                    videoViewController.setSubTitle(stream.userName != nil ? (stream.userName?.displayName)! : "")
+            }
             videoViewController.setTitle(stream.title)
-            videoViewController.setSubTitle("title.streamer_playing_game".l10nf(arg: [
-                stream.userName != nil ? (stream.userName?.displayName)! : "",
-                stream.gameName != nil ? stream.gameName! : ""
-            ]))
             if let user: TwitchUser = self.user {
                 videoViewController.setThumbnailUrl(user.profileImageUrl)
             }
@@ -143,30 +168,132 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     /// Load info for the user to populate screen details
     private func loadUserInfo() {
         if let stream: TwitchStream = stream {
-            twitchApi?.getUsers(parameters: [
+            TwitchApi.getUsers(parameters: [
                 "id": stream.userId
             ], callback: { response in
                 if let users: Array<TwitchUser> = response {
                     if users.count == 1 {
                         self.user = users[0]
-                        self.backgroundImage?.setUrl((self.user?.offlineImageUrl)!,
+                        let _ = self.backgroundImage?.setUrl((self.user?.offlineImageUrl)!,
                                 errorImageName: nil)
                         self.descriptionTextView?.text = self.user?.description
                     }
                 }
             })
             updateFollowStatus()
+            loadVideos(completion: {
+                self.tableView?.reloadData()
+            })
+        }
+    }
+
+    /// Load videos
+    private func loadVideos(type: VideoType = .ALL, offset: Int? = 0, append: Bool? = false,
+                            completion: (() -> Void)?) {
+        let callback = completion != nil ? completion! : {}
+        var completionCount = 0
+        if let stream: TwitchStream = stream {
+            // Request archived videos
+            if (type == .ALL || type == .ARCHIVE) && !self.requestingArchivedVideos &&
+                       self.archivedVideosCursor < self.MAX_VIDEO_PAGES {
+                var params: Parameters = [
+                    "user_id": stream.userId,
+                    "type": "archive",
+                    "limit": 50
+                ]
+                if let offset = offset {
+                    params["offset"] = offset
+                }
+                self.requestingArchivedVideos = true
+                TwitchApi.getVideos(parameters: params, callback: { response in
+                    if let videos: Array<TwitchStream> = response {
+                        self.requestingArchivedVideos = false
+                        if let append = append {
+                            if append {
+                                if self.archivedVideos == nil {
+                                    self.archivedVideos = Array()
+                                }
+                                self.archivedVideos?.append(contentsOf: videos)
+                            }
+                            else {
+                                self.archivedVideos = videos
+                            }
+                        }
+                        else {
+                            self.archivedVideos = videos
+                        }
+                        self.archivedVideosCursor += 1
+                    }
+                    completionCount += 1
+                    if completionCount == 2 || type != .ALL {
+                        callback()
+                    }
+                })
+            }
+            else {
+                completionCount += 1
+                if type != .ALL {
+                    callback()
+                }
+            }
+            // Request highlights
+            if (type == .ALL || type == .HIGHLIGHT) && !self.requestingHighlightedVideos &&
+                       self.highlightedVideosCursor < self.MAX_VIDEO_PAGES {
+                var params: Parameters = [
+                    "user_id": stream.userId,
+                    "type": "highlight",
+                    "limit": 50
+                ]
+                if let offset = offset {
+                    params["offset"] = offset
+                }
+                self.requestingHighlightedVideos = true
+                TwitchApi.getVideos(parameters: params, callback: { response in
+                    if let videos: Array<TwitchStream> = response {
+                        self.requestingHighlightedVideos = false
+                        if let append = append {
+                            if append {
+                                if self.highlightedVideos == nil {
+                                    self.highlightedVideos = Array()
+                                }
+                                self.highlightedVideos?.append(contentsOf: videos)
+                            }
+                            else {
+                                self.highlightedVideos = videos
+                            }
+                        }
+                        else {
+                            self.highlightedVideos = videos
+                        }
+                        self.highlightedVideosCursor += 1
+                    }
+                    completionCount += 1
+                    if completionCount == 2 || type != .ALL {
+                        callback()
+                    }
+                })
+            }
+            else {
+                completionCount += 1
+                if completionCount == 2 && type == .ALL {
+                    callback()
+                }
+            }
+        }
+        else {
+            callback()
         }
     }
 
     /// Check if the user follows the current stream and update the follow button
     private func updateFollowStatus(loadCache: Bool = true) {
+        os_log("StreamInfoViewController: Updating follow status", type: .debug)
         if let stream: TwitchStream = stream {
-            if (twitchApi?.isLoggedIn)! {
-                twitchApi?.getFollows(parameters: [
+            if TwitchApi.isLoggedIn {
+                TwitchApi.getFollows(parameters: [
                     "from_id": TwitchApi.userId,
                     "to_id": stream.userId,
-                    "no_cache": !loadCache
+                    "no_cache": loadCache ? "false" : "true"
                 ], callback: { response in
                     if let follows: Array<TwitchUserFollow> = response {
                         // Is following
@@ -175,6 +302,8 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
                             self.followButton?.normalBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
                             self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_RED
                             self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                            self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                            self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
                             self.followButtonLabel?.text = "button.unfollow".l10n()
                         }
                         // Not following
@@ -183,6 +312,8 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
                             self.followButton?.normalBackgroundEndColor = Constants.COLOR_TWITCH_PURPLE
                             self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
                             self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                            self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                            self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
                             self.followButtonLabel?.text = "button.follow".l10n()
                         }
                     }
@@ -207,14 +338,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     }
 
     /// Handle application activating
-    func applicationDidBecomeActive() {
+    @objc func applicationDidBecomeActive() {
         os_log("StreamInfoViewController active", type: .debug)
         setBackgroundColorStyle()
-        // Propagate to the presented view
-        if let presentedView: ResettingViewController = self.presentedViewController as? ResettingViewController {
-            presentedView.applicationDidBecomeActive()
-        }
-        gameLabel?.applicationDidBecomeActive()
     }
 
     /// Set stream
@@ -225,12 +351,6 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     /// Set the preferred view
     override var preferredFocusedView: UIView? {
         return self.previewImageContainerView
-    }
-    
-    /// Handle the game button being selected
-    @IBAction
-    private func gameButtonSelected1(_ button: UIButton) {
-        // TODO open game view
     }
     
     /// Handle the game button being selected
@@ -249,8 +369,8 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
     @IBAction
     private func followButtonSelected(_ button: UIButton) {
         if let stream = self.stream {
-            if (twitchApi?.isLoggedIn)! {
-                twitchApi?.followUser(id: stream.userId, callback: { success in
+            if TwitchApi.isLoggedIn {
+                TwitchApi.followUser(id: stream.userId, callback: { success in
                     if success {
                         self.updateFollowStatus(loadCache: false)
                     }
@@ -264,5 +384,82 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, Resettin
                 self.present(loginViewController, animated: true)
             }
         }
+    }
+
+    /// Set table view rows
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        var rows: Int = 0
+        if self.archivedVideos != nil && (self.archivedVideos?.count)! > 0 {
+            rows += 1
+        }
+        if self.highlightedVideos != nil && (self.highlightedVideos?.count)! > 0 {
+            rows += 1
+        }
+        return rows
+    }
+
+    /// Set table view cells
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: VideoCollectionCell = tableView.dequeueReusableCell(withIdentifier: "collectionViewCell",
+                for: indexPath) as! VideoCollectionCell
+        if indexPath.item == 0 && self.archivedVideos != nil && (self.archivedVideos?.count)! > 0 {
+            cell.headerTitle = "title.archived_videos".l10n()
+            cell.videos = self.archivedVideos
+        }
+        else if self.highlightedVideos != nil && (self.highlightedVideos?.count)! > 0 {
+            cell.headerTitle = "title.highlighted_videos".l10n()
+            cell.videos = self.highlightedVideos
+        }
+        else {
+            cell.headerTitle = "title.videos".l10n()
+        }
+        cell.callbackAction = onVideoAction
+        cell.indexPath = indexPath
+        return cell
+    }
+
+    /// Handle a video item being selected or selection reaching the end of the list
+    func onVideoAction(videoCell: Any, gesture: UIGestureRecognizer) {
+        // Video selection
+        if let cell: VideoOnDemandCell = videoCell as? VideoOnDemandCell {
+            loadVideoView(cell.stream, .VIDEO)
+        }
+        // End of list - load more
+        else if let cell: VideoCollectionCell = videoCell as? VideoCollectionCell, let indexPath = cell.indexPath {
+            if indexPath.item == 0 && self.archivedVideos != nil && (self.archivedVideos?.count)! > 0 {
+                let count: Int = (self.archivedVideos?.count)!
+                loadVideos(type: .ARCHIVE, offset: archivedVideosCursor, append: true, completion: {
+                    cell.videos = self.archivedVideos
+                    var indexPaths: Array<IndexPath> = Array()
+                    var index: Int = count
+                    while index < (self.archivedVideos?.count)! {
+                        indexPaths.append(IndexPath(item: index, section: 0))
+                        index += 1
+                    }
+                    if indexPaths.count > 0 {
+                        cell.collectionView?.insertItems(at: indexPaths)
+                    }
+                })
+            }
+            else if self.highlightedVideos != nil && (self.highlightedVideos?.count)! > 0 {
+                let count: Int = (self.highlightedVideos?.count)!
+                loadVideos(type: .HIGHLIGHT, offset: highlightedVideosCursor, append: true, completion: {
+                    cell.videos = self.highlightedVideos
+                    var indexPaths: Array<IndexPath> = Array()
+                    var index: Int = count
+                    while index < (self.highlightedVideos?.count)! {
+                        indexPaths.append(IndexPath(item: index, section: 0))
+                        index += 1
+                    }
+                    if indexPaths.count > 0 {
+                        cell.collectionView?.insertItems(at: indexPaths)
+                    }
+                })
+            }
+        }
+    }
+
+    private enum VideoType {
+        case ARCHIVE, HIGHLIGHT, ALL
     }
 }
