@@ -102,11 +102,21 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
                 self.lastUpdateTime = Date().timeIntervalSince1970
                 if (!append!) || self.streams == nil {
                     self.streams = streams
+                    self.collectionView?.reloadData()
                 }
                 else {
+                    let count: Int = (self.streams?.count)!
                     self.streams?.append(contentsOf: streams)
+                    var indexPaths: Array<IndexPath> = Array()
+                    var index: Int = count
+                    while index < (self.streams?.count)! {
+                        indexPaths.append(IndexPath(item: index, section: 0))
+                        index += 1
+                    }
+                    if indexPaths.count > 0 {
+                        self.collectionView?.insertItems(at: indexPaths)
+                    }
                 }
-                self.collectionView?.reloadData()
             }
             else {
                 self.lastUpdateTime = 0
