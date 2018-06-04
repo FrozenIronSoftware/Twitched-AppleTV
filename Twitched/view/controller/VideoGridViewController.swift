@@ -1,5 +1,5 @@
 //
-//  PopularListViewController.swift
+//  VideoGridViewController.swift
 //  Twitched
 //
 //  Created by Rolando Islas on 4/28/18.
@@ -11,7 +11,7 @@ import Alamofire
 import os.log
 import L10n_swift
 
-class PopularListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class VideoGridViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     private let UPDATE_INTERVAL: TimeInterval = 60 * 10
     private let MAX_PAGE: Int = 10
@@ -23,12 +23,14 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
     private var page: Int?
     private var isLoading: Bool?
     private var initialHeaderBounds: CGRect?
+    @IBInspectable var gameId: String = ""
+    @IBInspectable var headerTitle: String = ""
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        os_log("PopularListView will appear", type: .debug)
+        os_log("VideoGridView will appear", type: .debug)
         if lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL {
             populateCollectionViewWithReset()
         }
@@ -75,10 +77,8 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
     /// Initialize
     override func viewDidLoad() {
         super.viewDidLoad()
-        os_log("PopularListView loaded", type: .debug)
+        os_log("VideoGridView loaded", type: .debug)
         populateCollectionViewWithReset()
-        // Save header location
-
     }
 
     /// Retrieves stream data from the API and populates the collection view
@@ -93,10 +93,13 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
         // Set to loading
         self.isLoading = true
         // Fetch streams
-        let params: Parameters = [
+        var params: Parameters = [
             "limit": 40,
             "offset": offset!
         ]
+        if !self.gameId.isEmpty {
+            params["game_id"] = self.gameId
+        }
         TwitchApi.getStreams(parameters: params, callback: { response in
             if let streams: Array<TwitchStream> = response {
                 self.lastUpdateTime = Date().timeIntervalSince1970
@@ -132,7 +135,7 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
     /// Handle a memory warning
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        os_log("PopularListViewController: Memory warning not handled", type: .error)
+        os_log("VideoGridViewController: Memory warning not handled", type: .error)
     }
 
     /// Define the number of cells
@@ -160,22 +163,28 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
             UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
                 cell.getThumbnail()?.transform = CGAffineTransform(scaleX: 1, y: 1)
             }, completion: { _ in
-                UIView.animate(withDuration: 0.2, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
-                    self.view.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+                UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
+                    self.view.transform = CGAffineTransform(scaleX: 1.4, y: 1.4)
                     self.view.alpha = 0
                 }, completion: { _ in
-                    if let stream: TwitchStream = cell.getStream() {
-                        let streamInfoViewController: StreamInfoViewController = self.storyboard?.instantiateViewController(
-                                withIdentifier: "streamInfoViewController") as! StreamInfoViewController
-                        streamInfoViewController.setStream(stream)
-                        self.present(streamInfoViewController, animated: true, completion: {
-                            self.view.transform = CGAffineTransform(scaleX: 1, y: 1)
-                            self.view.alpha = 1
-                        })
-                    }
+                    self.view.transform = CGAffineTransform(scaleX: 1, y: 1)
+                    self.view.alpha = 1
                 })
+                self.showStreamInfoScreen(cell.getStream())
             })
         })
+    }
+
+    /// Present the screen info screen
+    private func showStreamInfoScreen(_ stream: TwitchStream?) {
+        if let stream: TwitchStream = stream {
+            let streamInfoViewController: StreamInfoViewController = self.storyboard?.instantiateViewController(
+                    withIdentifier: "streamInfoViewController") as! StreamInfoViewController
+            streamInfoViewController.setStream(stream)
+            streamInfoViewController.modalPresentationStyle = .blurOverFullScreen
+            streamInfoViewController.modalTransitionStyle = .crossDissolve
+            self.present(streamInfoViewController, animated: true)
+        }
     }
 
     /// Handle item focused
@@ -234,14 +243,14 @@ class PopularListViewController: UIViewController, UICollectionViewDataSource, U
         let header: TextHeader = collectionView.dequeueReusableSupplementaryView(
                 ofKind: UICollectionElementKindSectionHeader,
                 withReuseIdentifier: "header", for: indexPath) as! TextHeader
-        header.textLabel?.text = "title.popular".l10n()
+        header.textLabel?.text = headerTitle.l10n()
         return header
     }
 
 
     /// Handle the application and this view resuming
     @objc func applicationDidBecomeActive() {
-        os_log("PopularListView active", type: .debug)
+        os_log("VideoGridView active", type: .debug)
         // Update the items if needed
         if lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL {
             populateCollectionViewWithReset()

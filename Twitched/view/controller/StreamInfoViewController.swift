@@ -355,8 +355,15 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     
     /// Handle the game button being selected
     @IBAction func gameButtonSelected(_ sender: FocusableLabel) {
-        // TODO open game view
-        print("game label selected")
+        if let stream = self.stream, let gameId = stream.gameId, let gameName = stream.gameName {
+            let videoGridViewController: VideoGridViewController = self.storyboard?.instantiateViewController(
+                    withIdentifier: "videoGridViewController") as! VideoGridViewController
+            videoGridViewController.gameId = gameId
+            videoGridViewController.headerTitle = gameName
+            videoGridViewController.modalPresentationStyle = .blurOverFullScreen
+            videoGridViewController.modalTransitionStyle = .crossDissolve
+            self.present(videoGridViewController, animated: true)
+        }
     }
     
     /// Handle the play button being pressed

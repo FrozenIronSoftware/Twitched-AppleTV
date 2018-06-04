@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Popular List Controller-->
+        <!--Video Grid Controller-->
         <scene sceneID="hNz-n2-bh7">
             <objects>
-                <viewController restorationIdentifier="popularListController" title="Popular List Controller" id="9pv-A4-QxB" customClass="PopularListViewController" customModule="Twitched" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="videoGridViewController" title="Video Grid Controller" useStoryboardIdentifierAsRestorationIdentifier="YES" id="9pv-A4-QxB" customClass="VideoGridViewController" customModule="Twitched" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="GS6-LF-o1b"/>
                         <viewControllerLayoutGuide type="bottom" id="wOl-8a-21g"/>
@@ -130,6 +130,9 @@
                                             </variation>
                                         </label>
                                     </subviews>
+                                    <connections>
+                                        <outlet property="textLabel" destination="KsX-Wa-2OQ" id="ROQ-xz-lJL"/>
+                                    </connections>
                                 </collectionReusableView>
                                 <connections>
                                     <outlet property="dataSource" destination="9pv-A4-QxB" id="wEB-Ra-KUl"/>
@@ -141,10 +144,13 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Popular" id="4rY-AZ-N8y"/>
                     <simulatedTabBarMetrics key="simulatedTopBarMetrics"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="string" keyPath="headerTitle" value="title.popular"/>
+                    </userDefinedRuntimeAttributes>
                     <connections>
-                        <outlet property="collectionView" destination="fac-oT-3gH" id="jHg-k7-qNV"/>
-                        <outlet property="loadingIndicator" destination="fgs-iL-9zv" id="uJF-Jj-KMi"/>
-                        <outlet property="messageLabel" destination="EC1-md-g4B" id="mHO-it-ncr"/>
+                        <outlet property="collectionView" destination="fac-oT-3gH" id="jhQ-JA-vEG"/>
+                        <outlet property="loadingIndicator" destination="fgs-iL-9zv" id="yye-kQ-2Sd"/>
+                        <outlet property="messageLabel" destination="EC1-md-g4B" id="gZf-k8-r0M"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>

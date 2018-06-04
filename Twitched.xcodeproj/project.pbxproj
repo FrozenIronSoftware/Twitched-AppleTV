@@ -34,7 +34,7 @@
 		520FFE07910F39C07782AF92 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAFF6F583221F4F7B6BC /* Constants.swift */; };
 		520FFE1856A1A737045D0D4E /* TwitchedLinkId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */; };
 		520FFFAA22B687D4D0E8215C /* ImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF98C71FABF603A7C49B4 /* ImageUtil.swift */; };
-		520FFFC145B25490C2BC3766 /* PopularListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF35D422D4840ECBFF866 /* PopularListViewController.swift */; };
+		520FFFC145B25490C2BC3766 /* VideoGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */; };
 		520FFFD82B4BA7366F07CF4B /* TextHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFABDA6637BE47A08451 /* TextHeader.swift */; };
 		A934296D20AAE44A00521B3A /* ReLax.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A934296C20AAE44A00521B3A /* ReLax.framework */; };
 		A94FE53E20A8017400EC19A2 /* L10n_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A94FE53D20A8017400EC19A2 /* L10n_swift.framework */; };
@@ -70,7 +70,7 @@
 		520FF08CAA6201072A651031 /* TwitchAccessToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchAccessToken.swift; path = Twitched/data/json/TwitchAccessToken.swift; sourceTree = SOURCE_ROOT; };
 		520FF11965F219593280BA42 /* L10nExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = L10nExtension.swift; sourceTree = "<group>"; };
 		520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchStream.swift; sourceTree = "<group>"; };
-		520FF35D422D4840ECBFF866 /* PopularListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopularListViewController.swift; sourceTree = "<group>"; };
+		520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoGridViewController.swift; sourceTree = "<group>"; };
 		520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchedLinkId.swift; path = Twitched/data/json/TwitchedLinkId.swift; sourceTree = SOURCE_ROOT; };
 		520FF4B0596F638301A02309 /* TwitchedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchedUITests.swift; sourceTree = "<group>"; };
 		520FF4B38C26C2F224FDA220 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -263,7 +263,7 @@
 				520FF6427EC66C5B6082B492 /* NavigationController.swift */,
 				520FF8073DF62DEA67B625BB /* GameListViewController.swift */,
 				520FF064E8CE0B5D6ACC449F /* StreamInfoViewController.swift */,
-				520FF35D422D4840ECBFF866 /* PopularListViewController.swift */,
+				520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */,
 				520FFF6E97F17AFD0D0A3DE7 /* VideoViewController.swift */,
 				520FFF42E82888CE5453919C /* LoginViewController.swift */,
 			);
@@ -513,7 +513,7 @@
 				A9FCEDC620B424900055A071 /* FocusTvButton.swift in Sources */,
 				520FFBE5CF88BCDD5AA5447D /* GameListViewController.swift in Sources */,
 				520FF1435744EA8711C34976 /* StreamInfoViewController.swift in Sources */,
-				520FFFC145B25490C2BC3766 /* PopularListViewController.swift in Sources */,
+				520FFFC145B25490C2BC3766 /* VideoGridViewController.swift in Sources */,
 				520FF84CF89D0A0C1B5D8F19 /* FocusableView.swift in Sources */,
 				520FF8510B3CAD185D2579C3 /* VideoViewController.swift in Sources */,
 				520FF4D765A5FD4E85DA597C /* FocusableTextView.swift in Sources */,
