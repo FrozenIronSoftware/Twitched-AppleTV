@@ -37,6 +37,8 @@
 "title.archived_videos" = "Past Broadcasts";
 "title.highlighted_videos" = "Highlights";
 "title.videos" = "Videos";
+"title.games" = "Games";
+"title.followed_games" = "Followed Games";
 
 /* Message
    Items in this group should be full sentences or paragraphs. */

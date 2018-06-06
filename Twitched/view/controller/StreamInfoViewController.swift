@@ -32,6 +32,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     private var highlightedVideosCursor: Int = 0
     private var requestingArchivedVideos: Bool = false
     private var requestingHighlightedVideos: Bool = false
+    private var isFollowing: Bool = false
 
     /// Handle view loading
     override func viewDidLoad() {
@@ -223,6 +224,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                             self.archivedVideos = videos
                         }
                         self.archivedVideosCursor += 1
+                        if videos.count < 50 {
+                            self.archivedVideosCursor = self.MAX_VIDEO_PAGES
+                        }
                     }
                     completionCount += 1
                     if completionCount == 2 || type != .ALL {
@@ -266,6 +270,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                             self.highlightedVideos = videos
                         }
                         self.highlightedVideosCursor += 1
+                        if videos.count < 50 {
+                            self.highlightedVideosCursor = self.MAX_VIDEO_PAGES
+                        }
                     }
                     completionCount += 1
                     if completionCount == 2 || type != .ALL {
@@ -305,6 +312,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                             self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
                             self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
                             self.followButtonLabel?.text = "button.unfollow".l10n()
+                            self.isFollowing = true
                         }
                         // Not following
                         else {
@@ -315,6 +323,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                             self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
                             self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
                             self.followButtonLabel?.text = "button.follow".l10n()
+                            self.isFollowing = false
                         }
                     }
                 })
@@ -377,11 +386,20 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     private func followButtonSelected(_ button: UIButton) {
         if let stream = self.stream {
             if TwitchApi.isLoggedIn {
-                TwitchApi.followUser(id: stream.userId, callback: { success in
-                    if success {
-                        self.updateFollowStatus(loadCache: false)
-                    }
-                })
+                if isFollowing {
+                    TwitchApi.unfollowUser(id: stream.userId, callback: { success in
+                        if success {
+                            self.updateFollowStatus(loadCache: false)
+                        }
+                    })
+                }
+                else {
+                    TwitchApi.followUser(id: stream.userId, callback: { success in
+                        if success {
+                            self.updateFollowStatus(loadCache: false)
+                        }
+                    })
+                }
             }
             else {
                 let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
@@ -433,7 +451,8 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
         }
         // End of list - load more
         else if let cell: VideoCollectionCell = videoCell as? VideoCollectionCell, let indexPath = cell.indexPath {
-            if indexPath.item == 0 && self.archivedVideos != nil && (self.archivedVideos?.count)! > 0 {
+            if indexPath.item == 0 && self.archivedVideos != nil && (self.archivedVideos?.count)! > 0 &&
+                       !self.requestingArchivedVideos {
                 let count: Int = (self.archivedVideos?.count)!
                 loadVideos(type: .ARCHIVE, offset: archivedVideosCursor, append: true, completion: {
                     cell.videos = self.archivedVideos
@@ -448,7 +467,8 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                     }
                 })
             }
-            else if self.highlightedVideos != nil && (self.highlightedVideos?.count)! > 0 {
+            else if self.highlightedVideos != nil && (self.highlightedVideos?.count)! > 0 &&
+                            !self.requestingHighlightedVideos {
                 let count: Int = (self.highlightedVideos?.count)!
                 loadVideos(type: .HIGHLIGHT, offset: highlightedVideosCursor, append: true, completion: {
                     cell.videos = self.highlightedVideos

@@ -25,6 +25,18 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     private var initialHeaderBounds: CGRect?
     @IBInspectable var gameId: String = ""
     @IBInspectable var headerTitle: String = ""
+    private var isFollowButtonEnabled: Bool {
+        get {
+            return !gameId.isEmpty
+        }
+    }
+    private var focusGuide: UIFocusGuide?
+    private var followButton: FocusTvButton?
+    private var followButtonLabel: UILabel?
+    override var preferredFocusEnvironments: [UIFocusEnvironment] {
+        return [self.collectionView!]
+    }
+    private var isFollowing: Bool = false
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
@@ -120,6 +132,10 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                         self.collectionView?.insertItems(at: indexPaths)
                     }
                 }
+                self.page? += 1
+                if streams.count < 40 {
+                    self.page = self.MAX_PAGE
+                }
             }
             else {
                 self.lastUpdateTime = 0
@@ -195,13 +211,14 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         if let indexPath = context.nextFocusedIndexPath {
             if let header = collectionView.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
                     at: IndexPath(item: 0, section: 0)) {
-                if indexPath.section == 0 && indexPath.item == 0 {
+                if indexPath.section == 0 && (indexPath.item == 0 || (indexPath.item == 3 && isFollowButtonEnabled)) {
                     UIView.animate(withDuration: 0.2, animations: {
                         header.bounds = (self.initialHeaderBounds?.offsetBy(dx: 1, dy: 20))!
                     })
                 }
                 else if let previousIndexPath = context.previouslyFocusedIndexPath {
-                    if previousIndexPath.section == 0 && previousIndexPath.item == 0 {
+                    if previousIndexPath.section == 0 && (previousIndexPath.item == 0 ||
+                            (previousIndexPath.item == 3 && isFollowButtonEnabled)) {
                         UIView.animate(withDuration: 0.2, animations: {
                             header.bounds = self.initialHeaderBounds!
                         })
@@ -220,7 +237,6 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             if let streams = self.streams {
                 if indexPath.item >= streams.count - 1 - 4 && indexPath.item <= streams.count - 1 && !isLoading! &&
                            page! < MAX_PAGE {
-                    page? += 1
                     populateCollectionView(offset: page, append: true)
                 }
             }
@@ -230,7 +246,9 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
                     at: IndexPath(item: 0, section: 0)) {
                 if let bounds = self.initialHeaderBounds {
-                    header.bounds = bounds
+                    UIView.animate(withDuration: 0.2, animations: {
+                        header.bounds = bounds
+                    })
                 }
             }
         }
@@ -244,9 +262,111 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                 ofKind: UICollectionElementKindSectionHeader,
                 withReuseIdentifier: "header", for: indexPath) as! TextHeader
         header.textLabel?.text = headerTitle.l10n()
+        if !isFollowButtonEnabled {
+            header.followButton?.isEnabled = false
+            header.followButton?.isUserInteractionEnabled = false
+            header.followButton?.alpha = 0
+            header.followButtonView?.alpha = 0
+        }
+        else {
+            // Show
+            DispatchQueue.global().async(execute: {
+                while self.streams == nil {}
+                DispatchQueue.main.async(execute: {
+                    UIView.animate(withDuration: 0.2, animations: {
+                        header.followButton?.isEnabled = true
+                        header.followButton?.isUserInteractionEnabled = true
+                        header.followButton?.alpha = 1
+                        header.followButtonView?.alpha = 1
+                        header.followButtonLabel?.alpha = 1
+                    })
+                })
+            })
+            // Create focus guide
+            if let focusGuide = self.focusGuide {
+                self.view.removeLayoutGuide(focusGuide)
+            }
+            focusGuide = UIFocusGuide()
+            self.view.addLayoutGuide(focusGuide!)
+            focusGuide?.preferredFocusEnvironments = [header.followButton!]
+            focusGuide?.widthAnchor.constraint(equalTo: (header.textLabel?.widthAnchor)!).isActive = true
+            focusGuide?.heightAnchor.constraint(equalTo: (header.textLabel?.heightAnchor)!).isActive = true
+            focusGuide?.topAnchor.constraint(equalTo: (header.textLabel?.topAnchor)!).isActive = true
+            focusGuide?.leftAnchor.constraint(equalTo: (header.textLabel?.leftAnchor)!).isActive = true
+            // Set button style
+            self.followButton = header.followButton
+            self.followButtonLabel = header.followButtonLabel
+            updateFollowStatus()
+            // Set button callback
+            header.callbackAction = onFollowButtonSelected
+        }
         return header
     }
 
+    /// Handle follow button selection
+    func onFollowButtonSelected(button: Any, gesture: UIGestureRecognizer) {
+        if let _: FocusTvButton = button as? FocusTvButton {
+            if TwitchApi.isLoggedIn {
+                if isFollowing {
+                    TwitchApi.unfollowGame(id: gameId, callback: { success in
+                        if success {
+                            self.updateFollowStatus(loadCache: false)
+                        }
+                    })
+                }
+                else {
+                    TwitchApi.followGame(id: gameId, callback: { success in
+                        if success {
+                            self.updateFollowStatus(loadCache: false)
+                        }
+                    })
+                }
+            }
+            else  {
+                let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
+                        withIdentifier: "loginViewController") as! LoginViewController
+                loginViewController.modalPresentationStyle = .blurOverFullScreen
+                loginViewController.modalTransitionStyle = .crossDissolve
+                self.present(loginViewController, animated: true)
+            }
+        }
+    }
+
+    /// Check if the user follows the current stream and update the follow button
+    private func updateFollowStatus(loadCache: Bool = true) {
+        os_log("VideoGridViewController: Updating follow status", type: .debug)
+        if TwitchApi.isLoggedIn {
+            TwitchApi.getFollowedGame(parameters: [
+                "id": self.gameId,
+                "no_cache": loadCache ? "false" : "true"
+            ], callback: { isFollowing in
+                UIView.animate(withDuration: 0.2, animations: {
+                    // Is following
+                    if isFollowing {
+                        self.followButton?.normalBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                        self.followButton?.normalBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                        self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                        self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                        self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                        self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                        self.followButtonLabel?.text = "button.unfollow".l10n()
+                        self.isFollowing = true
+                    }
+                    // Not following
+                    else {
+                        self.followButton?.normalBackgroundColor = Constants.COLOR_TWITCH_PURPLE
+                        self.followButton?.normalBackgroundEndColor = Constants.COLOR_TWITCH_PURPLE
+                        self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                        self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                        self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                        self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                        self.followButtonLabel?.text = "button.follow".l10n()
+                        self.isFollowing = false
+                    }
+                })
+            })
+        }
+    }
 
     /// Handle the application and this view resuming
     @objc func applicationDidBecomeActive() {

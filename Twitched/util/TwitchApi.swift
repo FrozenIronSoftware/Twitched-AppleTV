@@ -68,9 +68,9 @@ class TwitchApi {
     }
 
     /// Check the last login time and verify the token
-    static func tryTimeLogIn() {
+    static func tryTimeLogIn(callback: @escaping (Bool) -> Void = {_ in}) {
         if !isLoggedIn || Date().timeIntervalSince1970 - lastLoginTime >= LOGIN_INTERVAL {
-            log_in(invalidate: false)
+            log_in(invalidate: false, callback: callback)
         }
     }
 
@@ -156,7 +156,7 @@ class TwitchApi {
 
     /// Attempts to log in using stored credentials
     /// @param invalid Bool Should the
-    private static func log_in(invalidate: Bool = true) {
+    private static func log_in(invalidate: Bool = true, callback: @escaping (Bool) -> Void = {_ in}) {
         os_log("Attempting to log in", type: .debug)
         let cloud = NSUbiquitousKeyValueStore.default
         if invalidate {
@@ -173,6 +173,7 @@ class TwitchApi {
                     if let tokenValidation: TwitchTokenValidation = response {
                         os_log("Token validated. Logged in", type: .debug)
                         TwitchApi.tokenValidation = tokenValidation
+                        callback(true)
                     }
                     // Token was invalid. Attempt to refresh
                     else {
@@ -190,23 +191,40 @@ class TwitchApi {
                                         self.validateToken(callback: { response in
                                             if let tokenValidation: TwitchTokenValidation = response {
                                                 TwitchApi.tokenValidation = tokenValidation
+                                                callback(true)
+                                            }
+                                            else {
+                                                os_log("Refresh token failed validation", type: .debug)
+                                                callback(false)
                                             }
                                         })
-                                    } else {
+                                    }
+                                    else {
                                         os_log("Failed to refresh token", type: .debug)
+                                        callback(false)
                                     }
                                 })
                             }
+                            else {
+                                os_log("No scope. Not refreshing", type: .debug)
+                                callback(false)
+                            }
+                        }
+                        else {
+                            os_log("No refresh token. Not refreshing", type: .debug)
+                            callback(false)
                         }
                     }
                 })
             }
             catch {
                 os_log("Failed to parse saved access token JSON data", type: .debug)
+                callback(false)
             }
         }
         else {
             os_log("Access token not read from iCloud KVS", type: .debug)
+            callback(false)
         }
     }
 
@@ -305,6 +323,70 @@ class TwitchApi {
         }
     }
 
+    /// Unfollow a game
+    class func unfollowGame(id: String, callback: @escaping (Bool) -> Void) {
+        let url: String = API + "/twitch/games/unfollow"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: [
+            "id": id
+        ], headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                callback(true)
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(false)
+            }
+        }
+    }
+
+    /// Follow a game
+    class func followGame(id: String, callback: @escaping (Bool) -> Void) {
+        let url: String = API + "/twitch/games/follow"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: [
+            "id": id
+        ], headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                callback(true)
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(false)
+            }
+        }
+    }
+
+    /// Check if a user follows a game
+    class func getFollowedGame(parameters: Parameters, callback: @escaping (Bool) -> Void) {
+        let url: String = API + "/twitch/games/following"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    let data: TwitchGameFollowStatus = try JSONDecoder().decode(TwitchGameFollowStatus.self,
+                            from: response.result.value!)
+                    if data.status {
+                        callback(true)
+                    }
+                    else {
+                        callback(false)
+                    }
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@",
+                            url,
+                            response.result.value.debugDescription)
+                    callback(false)
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(false)
+            }
+        }
+    }
+
     /// Send a request to follow a user
     static func followUser(id: String, callback: @escaping (Bool) -> Void) {
         let url: String = API_KRAKEN + "/users/follows/follow"
@@ -329,6 +411,23 @@ class TwitchApi {
                 return String(format: "%@/twitch/hls/60/1080p/ATV/:%@.m3u8", arguments: [API, id])
             case .VIDEO:
                 return String(format: "%@/twitch/vod/60/1080p/ATV/%@.m3u8", arguments: [API, id])
+        }
+    }
+
+    /// Unfollow a user
+    class func unfollowUser(id: String, callback: @escaping (Bool) -> Void) {
+        let url: String = API_KRAKEN + "/users/follows/unfollow"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: [
+            "id": id
+        ], headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                callback(true)
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(false)
+            }
         }
     }
 
@@ -410,6 +509,56 @@ class TwitchApi {
             case .success:
                 do {
                     let data: Array<TwitchUser> = try JSONDecoder().decode(Array<TwitchUser>.self,
+                            from: response.result.value!)
+                    callback(data)
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@",
+                            url,
+                            response.result.value.debugDescription)
+                    callback(nil)
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(nil)
+            }
+        }
+    }
+
+    /// Request the top games
+    static func getTopGames(parameters: Parameters, callback: @escaping (Array<TwitchGame>?) -> Void) {
+        let url: String = API_HELIX + "/games/top"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    let data: Array<TwitchGame> = try JSONDecoder().decode(Array<TwitchGame>.self,
+                            from: response.result.value!)
+                    callback(data)
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@",
+                            url,
+                            response.result.value.debugDescription)
+                    callback(nil)
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(nil)
+            }
+        }
+    }
+
+    /// Request the top games
+    static func getFollowedGames(parameters: Parameters, callback: @escaping (Array<TwitchGame>?) -> Void) {
+        let url: String = API + "/twitch/games/follows"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    let data: Array<TwitchGame> = try JSONDecoder().decode(Array<TwitchGame>.self,
                             from: response.result.value!)
                     callback(data)
                 }

@@ -8,6 +8,8 @@ import UIKit
 class Constants {
     public static let IMAGE_LOADING_VIDEO_THUMBNAIL: String = "Video Thumbnail Loading Image"
     public static let IMAGE_ERROR_VIDEO_THUMBNAIL: String =  "Video Thumbnail Error Image"
+    public static let IMAGE_LOADING_GAME_THUMBNAIL: String = "Game Thumbnail Loading Image"
+    public static let IMAGE_ERROR_GAME_THUMBNAIL: String = "Game Thumbnail Error Image"
     public static let IMAGE_PLAY_BUTTON: String = "Play Button"
     public static let IMAGE_FOLLOW_BUTTON: String = "Follow Button"
     public static let IMAGE_UNFOLLOW_BUTTON: String = "Unfollow Button"

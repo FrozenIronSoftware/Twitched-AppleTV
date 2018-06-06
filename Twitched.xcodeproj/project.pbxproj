@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		520FF0368C4C7DC15EA82B1F /* TwitchAccessToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF08CAA6201072A651031 /* TwitchAccessToken.swift */; };
+		520FF0EF1F1804D8577B0E05 /* TwitchGameFollowStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF863F95BC41252C56E2F /* TwitchGameFollowStatus.swift */; };
 		520FF1435744EA8711C34976 /* StreamInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF064E8CE0B5D6ACC449F /* StreamInfoViewController.swift */; };
 		520FF18D72D6D47D02647FDF /* VideoCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFA67BC34B13DDDB537C9 /* VideoCollectionCell.swift */; };
 		520FF1FE230C756ACDE5A8DC /* TwitchUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF594D5D6D23B7F1E7AA2 /* TwitchUser.swift */; };
@@ -18,6 +19,7 @@
 		520FF4A9A88145C0E4CEBBD4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4B38C26C2F224FDA220 /* AppDelegate.swift */; };
 		520FF4D765A5FD4E85DA597C /* FocusableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF6AC6E4563CE16B9D11D /* FocusableTextView.swift */; };
 		520FF616848AC65FDB57CAFC /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFF42E82888CE5453919C /* LoginViewController.swift */; };
+		520FF63D597400138B8B6944 /* GameCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAEA2D592121AE726287 /* GameCollectionCell.swift */; };
 		520FF66FB9429995890AF38D /* TwitchUserFollow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF7231B6664B0908FACEC /* TwitchUserFollow.swift */; };
 		520FF68F75C2016EF610F9D9 /* TwitchStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */; };
 		520FF6F7669C555E8D2A63BE /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF862DBB6424CEE37E5CE /* TwitchApi.swift */; };
@@ -26,6 +28,7 @@
 		520FF84CF89D0A0C1B5D8F19 /* FocusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFF1C539334046C290FB /* FocusableView.swift */; };
 		520FF8510B3CAD185D2579C3 /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFF6E97F17AFD0D0A3DE7 /* VideoViewController.swift */; };
 		520FF9B4F1E02732E9EDAF6F /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF6427EC66C5B6082B492 /* NavigationController.swift */; };
+		520FFA746F11A2758F17B9A5 /* GameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAF8AC6A1DEEDF17E5B5 /* GameCell.swift */; };
 		520FFAB8FE3AAA315059C4FC /* TwitchUserName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFEF5CCB6971AEB1AD7E6 /* TwitchUserName.swift */; };
 		520FFB1BEFF8EAA4824BC42C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 520FFD6A32A7BCF45D418E01 /* Assets.xcassets */; };
 		520FFBE5CF88BCDD5AA5447D /* GameListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF8073DF62DEA67B625BB /* GameListViewController.swift */; };
@@ -33,6 +36,7 @@
 		520FFD963963F3854FBDE634 /* TwitchedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF74D46312D89C92150AD /* TwitchedTests.swift */; };
 		520FFE07910F39C07782AF92 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAFF6F583221F4F7B6BC /* Constants.swift */; };
 		520FFE1856A1A737045D0D4E /* TwitchedLinkId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */; };
+		520FFF9878F53EB575B14874 /* TwitchGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF9533175CC293F41A2AA /* TwitchGame.swift */; };
 		520FFFAA22B687D4D0E8215C /* ImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF98C71FABF603A7C49B4 /* ImageUtil.swift */; };
 		520FFFC145B25490C2BC3766 /* VideoGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */; };
 		520FFFD82B4BA7366F07CF4B /* TextHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFABDA6637BE47A08451 /* TextHeader.swift */; };
@@ -84,12 +88,16 @@
 		520FF7DA223E8D4A9B967D40 /* TwitchedUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwitchedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		520FF8073DF62DEA67B625BB /* GameListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameListViewController.swift; sourceTree = "<group>"; };
 		520FF862DBB6424CEE37E5CE /* TwitchApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchApi.swift; sourceTree = "<group>"; };
+		520FF863F95BC41252C56E2F /* TwitchGameFollowStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchGameFollowStatus.swift; path = Twitched/data/json/TwitchGameFollowStatus.swift; sourceTree = SOURCE_ROOT; };
 		520FF87A953ED8A0E4788D4B /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		520FF90AF0D2F9F93ACF6B15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
+		520FF9533175CC293F41A2AA /* TwitchGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchGame.swift; path = Twitched/data/json/TwitchGame.swift; sourceTree = SOURCE_ROOT; };
 		520FF98C71FABF603A7C49B4 /* ImageUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageUtil.swift; sourceTree = "<group>"; };
 		520FF9F84BCACF61B53F185A /* secret.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secret.json; sourceTree = "<group>"; };
 		520FFA0F9BF6978B0A704F2B /* VideoOnDemandCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoOnDemandCell.swift; sourceTree = "<group>"; };
 		520FFA67BC34B13DDDB537C9 /* VideoCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCollectionCell.swift; sourceTree = "<group>"; };
+		520FFAEA2D592121AE726287 /* GameCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameCollectionCell.swift; sourceTree = "<group>"; };
+		520FFAF8AC6A1DEEDF17E5B5 /* GameCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameCell.swift; sourceTree = "<group>"; };
 		520FFAFF6F583221F4F7B6BC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		520FFB683CD3F010074A61C2 /* CallbackActionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackActionHandler.swift; sourceTree = "<group>"; };
 		520FFCDCD64C8E7971565151 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
@@ -281,6 +289,8 @@
 				520FF4D74DBC1F8E242C047B /* TwitchTokenValidation.swift */,
 				520FF7231B6664B0908FACEC /* TwitchUserFollow.swift */,
 				520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */,
+				520FF9533175CC293F41A2AA /* TwitchGame.swift */,
+				520FF863F95BC41252C56E2F /* TwitchGameFollowStatus.swift */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -328,6 +338,8 @@
 				520FFFABDA6637BE47A08451 /* TextHeader.swift */,
 				520FFA67BC34B13DDDB537C9 /* VideoCollectionCell.swift */,
 				520FFA0F9BF6978B0A704F2B /* VideoOnDemandCell.swift */,
+				520FFAEA2D592121AE726287 /* GameCollectionCell.swift */,
+				520FFAF8AC6A1DEEDF17E5B5 /* GameCell.swift */,
 			);
 			path = collection;
 			sourceTree = "<group>";
@@ -526,6 +538,10 @@
 				520FFE1856A1A737045D0D4E /* TwitchedLinkId.swift in Sources */,
 				520FF18D72D6D47D02647FDF /* VideoCollectionCell.swift in Sources */,
 				520FFCAA1F4A6DECF3D2FCD2 /* VideoOnDemandCell.swift in Sources */,
+				520FF63D597400138B8B6944 /* GameCollectionCell.swift in Sources */,
+				520FFA746F11A2758F17B9A5 /* GameCell.swift in Sources */,
+				520FFF9878F53EB575B14874 /* TwitchGame.swift in Sources */,
+				520FF0EF1F1804D8577B0E05 /* TwitchGameFollowStatus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
