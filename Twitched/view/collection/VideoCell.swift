@@ -43,18 +43,27 @@ class VideoCell: UICollectionViewCell {
     func setStream(_ stream: TwitchStream) {
         self.stream = stream
         titleLabel?.text = stream.title
-        descriptionLabel?.text = String(format: "%@ %@ %@ %@",
-                stream.viewerCount.l10n(),
-                "inline.viewers".l10n(arg: stream.viewerCount),
-                "inline.on".l10n(),
-                stream.userName != nil ? (stream.userName?.displayName)! : "")
+        let isUser: Bool = stream.type == "user" || stream.type == "user_follow"
+        if isUser {
+            if let userName = stream.userName {
+                descriptionLabel?.text = userName.displayName
+            }
+        }
+        else {
+            descriptionLabel?.text = String(format: "%@ %@ %@ %@",
+                    stream.viewerCount.l10n(),
+                    "inline.viewers".l10n(arg: stream.viewerCount),
+                    "inline.on".l10n(),
+                    stream.userName != nil ? (stream.userName?.displayName)! : "")
+        }
         setThumbnail(stream.thumbnailUrl, stream.gameName != nil ? stream.gameName! : "",
                 Int((self.thumbnail?.bounds.width)!),
-                Int((self.thumbnail?.bounds.height)!))
+                Int((self.thumbnail?.bounds.height)!),
+                loadGame: !isUser)
     }
 
     /// Set the background thumbnail with the game cover layered on top
-    private func setThumbnail(_ url: String, _ gameName: String, _ width: Int, _ height: Int) {
+    private func setThumbnail(_ url: String, _ gameName: String, _ width: Int, _ height: Int, loadGame: Bool = true) {
         let url = url.replacingOccurrences(of: "{width}", with: width.description)
                 .replacingOccurrences(of: "{height}", with: height.description)
         let gameThumbnailUrl: String = TwitchApi.getGameThumbnailUrl(gameName: gameName,
@@ -68,21 +77,26 @@ class VideoCell: UICollectionViewCell {
         let uuid = self.uuid
         mainThumbRequest.responseData { response in
             if let thumbData = response.result.value {
-                gameThumbRequest.responseData { response in
-                    if let gameThumbData = response.result.value {
-                        let expandedGameImage: UIImage = ImageUtil.expandImageCanvas(image: UIImage(data: gameThumbData)!,
-                                alignHoriz: ImageUtil.Alignment.RIGHT,
-                                alignVert: ImageUtil.Alignment.BOTTOM,
-                                size: CGSize(width: width, height: height))
-                        let parallaxImage: ParallaxImage = ParallaxImage(images: [
-                            expandedGameImage,
-                            UIImage(data: thumbData)!
-                        ])
-                        self.thumbnail?.image = parallaxImage.image()
+                if loadGame {
+                    gameThumbRequest.responseData { response in
+                        if let gameThumbData = response.result.value {
+                            let expandedGameImage: UIImage = ImageUtil.expandImageCanvas(image: UIImage(data: gameThumbData)!,
+                                    alignHoriz: ImageUtil.Alignment.RIGHT,
+                                    alignVert: ImageUtil.Alignment.BOTTOM,
+                                    size: CGSize(width: width, height: height))
+                            let parallaxImage: ParallaxImage = ParallaxImage(images: [
+                                expandedGameImage,
+                                UIImage(data: thumbData)!
+                            ])
+                            self.thumbnail?.image = parallaxImage.image()
+                        }
+                        else {
+                            self.thumbnail?.image = UIImage(data: thumbData)
+                        }
                     }
-                    else {
-                        self.thumbnail?.image = UIImage(data: thumbData)
-                    }
+                }
+                else {
+                    self.thumbnail?.image = UIImage(data: thumbData)
                 }
             }
             else if uuid == self.uuid {

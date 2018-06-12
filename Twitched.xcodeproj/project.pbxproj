@@ -24,6 +24,7 @@
 		520FF66FB9429995890AF38D /* TwitchUserFollow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF7231B6664B0908FACEC /* TwitchUserFollow.swift */; };
 		520FF68F75C2016EF610F9D9 /* TwitchStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */; };
 		520FF6F7669C555E8D2A63BE /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF862DBB6424CEE37E5CE /* TwitchApi.swift */; };
+		520FF6FEB48F6D5C1614B832 /* OnlineOfflineCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */; };
 		520FF804ACF532693974C696 /* TwitchedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4B0596F638301A02309 /* TwitchedUITests.swift */; };
 		520FF82BB0D673B539B1E69F /* L10nExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF11965F219593280BA42 /* L10nExtension.swift */; };
 		520FF84CF89D0A0C1B5D8F19 /* FocusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFF1C539334046C290FB /* FocusableView.swift */; };
@@ -77,6 +78,7 @@
 		520FF11965F219593280BA42 /* L10nExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = L10nExtension.swift; sourceTree = "<group>"; };
 		520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchStream.swift; sourceTree = "<group>"; };
 		520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoGridViewController.swift; sourceTree = "<group>"; };
+		520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnlineOfflineCount.swift; sourceTree = "<group>"; };
 		520FF451309219761ACFBC10 /* TwitchCommunity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchCommunity.swift; sourceTree = "<group>"; };
 		520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchedLinkId.swift; path = Twitched/data/json/TwitchedLinkId.swift; sourceTree = SOURCE_ROOT; };
 		520FF4B0596F638301A02309 /* TwitchedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchedUITests.swift; sourceTree = "<group>"; };
@@ -180,8 +182,17 @@
 				520FF8C7D12D5E8E8D226518 /* json */,
 				520FF250D369608114673C9E /* codable */,
 				520FFAFF6F583221F4F7B6BC /* Constants.swift */,
+				520FF3EFCD36CC725713F61B /* model */,
 			);
 			path = data;
+			sourceTree = "<group>";
+		};
+		520FF3EFCD36CC725713F61B /* model */ = {
+			isa = PBXGroup;
+			children = (
+				520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */,
+			);
+			path = model;
 			sourceTree = "<group>";
 		};
 		520FF8C7D12D5E8E8D226518 /* json */ = {
@@ -550,6 +561,7 @@
 				520FF0EF1F1804D8577B0E05 /* TwitchGameFollowStatus.swift in Sources */,
 				520FFBADF52B23EFE82BBBF4 /* TwitchCommunity.swift in Sources */,
 				520FF26813D042345BB04656 /* FocusGuideRepresentation.swift in Sources */,
+				520FF6FEB48F6D5C1614B832 /* OnlineOfflineCount.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

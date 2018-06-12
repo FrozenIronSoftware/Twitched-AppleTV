@@ -26,6 +26,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     @IBInspectable var gameId: String = ""
     @IBInspectable var communityId: String = ""
     @IBInspectable var headerTitle: String = ""
+    @IBInspectable var loadFollowedStreams: Bool = false
     private var isFollowButtonEnabled: Bool {
         get {
             return !gameId.isEmpty || !communityId.isEmpty
@@ -39,6 +40,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     }
     private var isFollowing: Bool = false
     var dismissCompletion: () -> Void = {}
+    private var resultsPerPageLimit: Int {
+        get {
+            return loadFollowedStreams ? 500 : 40
+        }
+    }
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
@@ -108,7 +114,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         self.isLoading = true
         // Fetch streams
         var params: Parameters = [
-            "limit": 40,
+            "limit": resultsPerPageLimit,
             "offset": offset!
         ]
         if !self.gameId.isEmpty {
@@ -117,7 +123,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         if !self.communityId.isEmpty {
             params["community_id"] = self.communityId
         }
-        TwitchApi.getStreams(parameters: params, callback: { response in
+        let handleStreamData: (Array<TwitchStream>?) -> Void = { response in
             if let streams: Array<TwitchStream> = response {
                 self.lastUpdateTime = Date().timeIntervalSince1970
                 if (!append!) || self.streams == nil {
@@ -138,7 +144,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                     }
                 }
                 self.page? += 1
-                if streams.count < 40 {
+                if streams.count < self.resultsPerPageLimit || self.loadFollowedStreams {
                     self.page = self.MAX_PAGE
                 }
             }
@@ -150,7 +156,17 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             }
             self.loadingIndicator?.stopAnimating()
             self.isLoading = false
-        })
+        }
+        if loadFollowedStreams {
+            TwitchApi.afterLogin(callback: { isLoggedIn in
+                if isLoggedIn {
+                    TwitchApi.getFollowedStreams(parameters: params, callback: handleStreamData)
+                }
+            })
+        }
+        else {
+            TwitchApi.getStreams(parameters: params, callback: handleStreamData)
+        }
     }
 
     /// Handle a memory warning
@@ -161,7 +177,9 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
 
     /// Define the number of cells
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return streams != nil ? (streams?.count)! : 0
+        let counts = getStreamCounts()
+        return section == 1 && self.loadFollowedStreams ? counts.offlineCount :
+                self.loadFollowedStreams ? counts.onlineCount : counts.onlineCount + counts.offlineCount;
     }
 
     /// Populate cells
@@ -169,9 +187,30 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             UICollectionViewCell {
         let cell: VideoCell = collectionView.dequeueReusableCell(withReuseIdentifier: "video", for: indexPath)
                 as! VideoCell
-        let stream: TwitchStream = self.streams![indexPath.item]
-        cell.setStream(stream)
+        let counts: OnlineOfflineCount = getStreamCounts()
+        let streamIndex: Int = self.loadFollowedStreams && indexPath.section == 1 ?
+            indexPath.item + counts.onlineCount : indexPath.item
+        if let streams = self.streams, let stream = streams[safe: streamIndex] {
+            cell.setStream(stream)
+        }
         return cell
+    }
+
+    /// Get the online and offline stream count
+    /// Index 0 will be online index 1 will be offline
+    private func getStreamCounts() -> OnlineOfflineCount {
+        var onlineCount: Int = 0
+        var offlineCount: Int = 0
+        if let streams = self.streams {
+            for stream in streams {
+                if stream.type == "user" || stream.type == "user_follow" {
+                    offlineCount += 1;
+                } else {
+                    onlineCount += 1;
+                }
+            }
+        }
+        return OnlineOfflineCount(onlineCount, offlineCount)
     }
 
     /// Handle item selection
@@ -266,14 +305,19 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         let header: TextHeader = collectionView.dequeueReusableSupplementaryView(
                 ofKind: UICollectionElementKindSectionHeader,
                 withReuseIdentifier: "header", for: indexPath) as! TextHeader
-        header.textLabel?.text = headerTitle.l10n()
+        if self.loadFollowedStreams && indexPath.section == 1 {
+            header.textLabel?.text = "title.offline".l10n()
+        }
+        else {
+            header.textLabel?.text = headerTitle.l10n()
+        }
         if !isFollowButtonEnabled {
             header.followButton?.isEnabled = false
             header.followButton?.isUserInteractionEnabled = false
             header.followButton?.alpha = 0
             header.followButtonView?.alpha = 0
         }
-        else {
+        else if indexPath.section == 0 {
             // Show
             DispatchQueue.global().async(execute: {
                 while self.streams == nil {}
@@ -436,5 +480,10 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         super.dismiss(animated: flag, completion: completion)
         self.dismissCompletion()
+    }
+
+    /// Set sections
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return self.loadFollowedStreams ? 2 : 1;
     }
 }

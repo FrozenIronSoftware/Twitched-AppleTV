@@ -154,6 +154,31 @@ class TwitchApi {
         }
     }
 
+    /// Get the streams a user follows
+    static func getFollowedStreams(parameters: Parameters, callback: @escaping (Array<TwitchStream>?) -> Void) {
+        let url: String = API_HELIX + "/users/follows/streams"
+        os_log("Get request to %{public}@", url)
+        request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    let data: Array<TwitchStream> = try JSONDecoder().decode(Array<TwitchStream>.self,
+                            from: response.result.value!)
+                    callback(data)
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@",
+                            url,
+                            response.result.value.debugDescription)
+                    callback(nil)
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                callback(nil)
+            }
+        }
+    }
+
     /// Initialize the Twitch API
     /// Loads the config from secret.json and attempts to login
     static func initialize() {

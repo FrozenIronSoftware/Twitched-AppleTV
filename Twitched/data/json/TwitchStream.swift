@@ -7,7 +7,7 @@ import L10n_swift
 
 struct TwitchStream: Codable {
     // Stream
-    var id: String
+    var id: String?
     var userId: String
     var gameId: String?
     var communityIds: Array<String>?
@@ -28,7 +28,7 @@ struct TwitchStream: Codable {
     }
     var viewerCount: Int
     var startedAt: String?
-    var language: String
+    var language: String?
     var thumbnailUrl: String
 
     // VOD

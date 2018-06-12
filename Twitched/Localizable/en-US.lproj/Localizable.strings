@@ -41,6 +41,7 @@
 "title.followed_games" = "Followed Games";
 "title.communities" = "Communities";
 "title.followed_communities" = "Followed Communities";
+"title.offline" = "Offline";
 
 /* Message
    Items in this group should be full sentences or paragraphs. */
