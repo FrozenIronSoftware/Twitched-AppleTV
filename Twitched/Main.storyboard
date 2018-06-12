@@ -769,7 +769,7 @@
                         <viewControllerLayoutGuide type="top" id="FQt-lL-vsQ"/>
                         <viewControllerLayoutGuide type="bottom" id="P6h-20-2ck"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="WDv-hZ-QgX">
+                    <view key="view" contentMode="scaleToFill" restorationIdentifier="loginViewControllerView" id="WDv-hZ-QgX">
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -855,7 +855,7 @@
                         <viewControllerLayoutGuide type="top" id="idf-ow-ZXJ"/>
                         <viewControllerLayoutGuide type="bottom" id="auL-RR-3aQ"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="DHA-rj-kB7">
+                    <view key="view" contentMode="scaleToFill" restorationIdentifier="communityListViewControllerView" id="DHA-rj-kB7">
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -978,7 +978,7 @@
                         <viewControllerLayoutGuide type="top" id="0eP-ag-NFg"/>
                         <viewControllerLayoutGuide type="bottom" id="MMi-3t-dYa"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="gx6-Ku-QUh">
+                    <view key="view" contentMode="scaleToFill" restorationIdentifier="followedViewControllerView" id="gx6-Ku-QUh">
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
