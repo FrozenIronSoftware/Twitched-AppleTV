@@ -6,17 +6,25 @@
 import UIKit
 import Alamofire
 
-class GameCell: UICollectionViewCell {
+class PosterItemCell: UICollectionViewCell {
     @IBOutlet private weak var title: MarqueeLabel?
     @IBOutlet private weak var thumbnail: UIImageView?
     private var thumbnailRequest: DataRequest?
-    var game: TwitchGame? {
+    var item: Any? {
         didSet {
-            if let game = game {
+            if let game: TwitchGame = item as? TwitchGame {
                 self.title?.text = game.name
                 self.thumbnailRequest = self.thumbnail?.setUrl(game.boxArtUrl
                         .replacingOccurrences(of: "{width}", with: String(Int((self.thumbnail?.bounds.width)!)))
-                        .replacingOccurrences(of: "{height}", with: String(Int((self.thumbnail?.bounds.height)!))))
+                        .replacingOccurrences(of: "{height}", with: String(Int((self.thumbnail?.bounds.height)!))),
+                        errorImageName: Constants.IMAGE_ERROR_GAME_THUMBNAIL)
+            }
+            else if let community: TwitchCommunity = item as? TwitchCommunity {
+                self.title?.text = community.safeName
+                self.thumbnailRequest = self.thumbnail?.setUrl(community.avatarImageUrl
+                        .replacingOccurrences(of: "{width}", with: String(Int((self.thumbnail?.bounds.width)!)))
+                        .replacingOccurrences(of: "{height}", with: String(Int((self.thumbnail?.bounds.height)!))),
+                        errorImageName: Constants.IMAGE_ERROR_GAME_THUMBNAIL)
             }
         }
     }

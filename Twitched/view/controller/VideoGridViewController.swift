@@ -24,10 +24,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     private var isLoading: Bool?
     private var initialHeaderBounds: CGRect?
     @IBInspectable var gameId: String = ""
+    @IBInspectable var communityId: String = ""
     @IBInspectable var headerTitle: String = ""
     private var isFollowButtonEnabled: Bool {
         get {
-            return !gameId.isEmpty
+            return !gameId.isEmpty || !communityId.isEmpty
         }
     }
     private var focusGuide: UIFocusGuide?
@@ -37,6 +38,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         return [self.collectionView!]
     }
     private var isFollowing: Bool = false
+    var dismissCompletion: () -> Void = {}
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
@@ -111,6 +113,9 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         ]
         if !self.gameId.isEmpty {
             params["game_id"] = self.gameId
+        }
+        if !self.communityId.isEmpty {
+            params["community_id"] = self.communityId
         }
         TwitchApi.getStreams(parameters: params, callback: { response in
             if let streams: Array<TwitchStream> = response {
@@ -306,66 +311,111 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     /// Handle follow button selection
     func onFollowButtonSelected(button: Any, gesture: UIGestureRecognizer) {
         if let _: FocusTvButton = button as? FocusTvButton {
-            if TwitchApi.isLoggedIn {
-                if isFollowing {
-                    TwitchApi.unfollowGame(id: gameId, callback: { success in
-                        if success {
-                            self.updateFollowStatus(loadCache: false)
+            TwitchApi.afterLogin(callback: { isLoggedIn in
+                if isLoggedIn {
+                    // Game
+                    if !self.gameId.isEmpty {
+                        if self.isFollowing {
+                            TwitchApi.unfollowGame(id: self.gameId, callback: { success in
+                                if success {
+                                    self.updateFollowStatus(loadCache: false)
+                                }
+                            })
+                        } else {
+                            TwitchApi.followGame(id: self.gameId, callback: { success in
+                                if success {
+                                    self.updateFollowStatus(loadCache: false)
+                                }
+                            })
                         }
-                    })
-                }
-                else {
-                    TwitchApi.followGame(id: gameId, callback: { success in
-                        if success {
-                            self.updateFollowStatus(loadCache: false)
+                        PosterItemsListViewController.needsGameUpdate = true
+                    }
+                    // Community
+                    else if !self.communityId.isEmpty {
+                        if self.isFollowing {
+                            TwitchApi.unfollowCommunity(id: self.communityId, callback: { success in
+                                if success {
+                                    self.updateFollowStatus(loadCache: false)
+                                }
+                            })
                         }
-                    })
+                        else {
+                            TwitchApi.followCommunity(id: self.communityId, callback: { success in
+                                if success {
+                                    self.updateFollowStatus(loadCache: false)
+                                }
+                            })
+                        }
+                        PosterItemsListViewController.needsCommunityUpdate = true
+                    }
+                } else {
+                    let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
+                            withIdentifier: "loginViewController") as! LoginViewController
+                    loginViewController.modalPresentationStyle = .blurOverFullScreen
+                    loginViewController.modalTransitionStyle = .crossDissolve
+                    self.present(loginViewController, animated: true)
                 }
-            }
-            else  {
-                let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
-                        withIdentifier: "loginViewController") as! LoginViewController
-                loginViewController.modalPresentationStyle = .blurOverFullScreen
-                loginViewController.modalTransitionStyle = .crossDissolve
-                self.present(loginViewController, animated: true)
-            }
+            })
         }
     }
 
     /// Check if the user follows the current stream and update the follow button
     private func updateFollowStatus(loadCache: Bool = true) {
         os_log("VideoGridViewController: Updating follow status", type: .debug)
-        if TwitchApi.isLoggedIn {
-            TwitchApi.getFollowedGame(parameters: [
-                "id": self.gameId,
-                "no_cache": loadCache ? "false" : "true"
-            ], callback: { isFollowing in
-                UIView.animate(withDuration: 0.2, animations: {
-                    // Is following
-                    if isFollowing {
-                        self.followButton?.normalBackgroundColor = Constants.COLOR_FOLLOW_GREEN
-                        self.followButton?.normalBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
-                        self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_RED
-                        self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
-                        self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
-                        self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
-                        self.followButtonLabel?.text = "button.unfollow".l10n()
-                        self.isFollowing = true
-                    }
-                    // Not following
-                    else {
-                        self.followButton?.normalBackgroundColor = Constants.COLOR_TWITCH_PURPLE
-                        self.followButton?.normalBackgroundEndColor = Constants.COLOR_TWITCH_PURPLE
-                        self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
-                        self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
-                        self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
-                        self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
-                        self.followButtonLabel?.text = "button.follow".l10n()
-                        self.isFollowing = false
-                    }
-                })
-            })
-        }
+        TwitchApi.afterLogin(callback: { isLoggedIn in
+            if isLoggedIn {
+                // Followed games
+                if !self.gameId.isEmpty {
+                    TwitchApi.getFollowedGame(parameters: [
+                        "id": self.gameId,
+                        "no_cache": loadCache ? "false" : "true"
+                    ], callback: { isFollowing in
+                        self.setFollowButtonState(isFollowing)
+                    })
+                } else if !self.communityId.isEmpty {
+                    TwitchApi.getFollowedCommunities(parameters: [
+                        "to_id": self.communityId
+                    ], callback: { response in
+                        if let communities: Array<TwitchCommunity> = response {
+                            if communities.count > 0 {
+                                self.setFollowButtonState(true)
+                            } else {
+                                self.setFollowButtonState(false)
+                            }
+                        } else {
+                            self.setFollowButtonState(false)
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    /// Set follow button state with animation
+    private func setFollowButtonState(_ following: Bool) {
+        self.isFollowing = following
+        UIView.animate(withDuration: 0.2, animations: {
+            // Is following
+            if following {
+                self.followButton?.normalBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                self.followButton?.normalBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                self.followButtonLabel?.text = "button.unfollow".l10n()
+            }
+            // Not following
+            else {
+                self.followButton?.normalBackgroundColor = Constants.COLOR_TWITCH_PURPLE
+                self.followButton?.normalBackgroundEndColor = Constants.COLOR_TWITCH_PURPLE
+                self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                self.followButtonLabel?.text = "button.follow".l10n()
+            }
+        })
     }
 
     /// Handle the application and this view resuming
@@ -380,5 +430,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             let cell: VideoCell = cell as! VideoCell
             cell.setFocused(cell.isFocused)
         }
+    }
+
+    /// Handle dismissal
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        super.dismiss(animated: flag, completion: completion)
+        self.dismissCompletion()
     }
 }

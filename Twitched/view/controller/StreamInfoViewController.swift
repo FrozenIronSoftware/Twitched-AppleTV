@@ -41,6 +41,18 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
         setBackgroundColorStyle()
         setFieldData()
         addActionEvents()
+        addFocusGuide()
+    }
+
+    /// Add top focus guide
+    private func addFocusGuide() {
+        let focusGuide = UIFocusGuide()
+        self.view.addLayoutGuide(focusGuide)
+        focusGuide.preferredFocusEnvironments = [self.titleLabel!]
+        focusGuide.widthAnchor.constraint(equalTo: (titleLabel?.widthAnchor)!, multiplier: 1.1).isActive = true
+        focusGuide.heightAnchor.constraint(equalTo: (titleLabel?.heightAnchor)!).isActive = true
+        focusGuide.topAnchor.constraint(equalTo: (titleLabel?.topAnchor)!).isActive = true
+        focusGuide.leftAnchor.constraint(equalTo: (titleLabel?.leftAnchor)!).isActive = true
     }
 
     /// Will appear
@@ -176,7 +188,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                     if users.count == 1 {
                         self.user = users[0]
                         let _ = self.backgroundImage?.setUrl((self.user?.offlineImageUrl)!,
-                                errorImageName: nil)
+                                errorImageName: Constants.IMAGE_ERROR_VIDEO_THUMBNAIL)
                         self.descriptionTextView?.text = self.user?.description
                     }
                 }
@@ -296,38 +308,40 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     private func updateFollowStatus(loadCache: Bool = true) {
         os_log("StreamInfoViewController: Updating follow status", type: .debug)
         if let stream: TwitchStream = stream {
-            if TwitchApi.isLoggedIn {
-                TwitchApi.getFollows(parameters: [
-                    "from_id": TwitchApi.userId,
-                    "to_id": stream.userId,
-                    "no_cache": loadCache ? "false" : "true"
-                ], callback: { response in
-                    if let follows: Array<TwitchUserFollow> = response {
-                        // Is following
-                        if follows.count == 1 {
-                            self.followButton?.normalBackgroundColor = Constants.COLOR_FOLLOW_GREEN
-                            self.followButton?.normalBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
-                            self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_RED
-                            self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
-                            self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
-                            self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
-                            self.followButtonLabel?.text = "button.unfollow".l10n()
-                            self.isFollowing = true
+            TwitchApi.afterLogin(callback: { isLoggedIn in
+                if isLoggedIn {
+                    TwitchApi.getFollows(parameters: [
+                        "from_id": TwitchApi.userId,
+                        "to_id": stream.userId,
+                        "no_cache": loadCache ? "false" : "true"
+                    ], callback: { response in
+                        if let follows: Array<TwitchUserFollow> = response {
+                            // Is following
+                            if follows.count == 1 {
+                                self.followButton?.normalBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                                self.followButton?.normalBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                                self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                                self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                                self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_RED
+                                self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_RED
+                                self.followButtonLabel?.text = "button.unfollow".l10n()
+                                self.isFollowing = true
+                            }
+                            // Not following
+                            else {
+                                self.followButton?.normalBackgroundColor = Constants.COLOR_TWITCH_PURPLE
+                                self.followButton?.normalBackgroundEndColor = Constants.COLOR_TWITCH_PURPLE
+                                self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                                self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                                self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
+                                self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
+                                self.followButtonLabel?.text = "button.follow".l10n()
+                                self.isFollowing = false
+                            }
                         }
-                        // Not following
-                        else {
-                            self.followButton?.normalBackgroundColor = Constants.COLOR_TWITCH_PURPLE
-                            self.followButton?.normalBackgroundEndColor = Constants.COLOR_TWITCH_PURPLE
-                            self.followButton?.selectedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
-                            self.followButton?.selectedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
-                            self.followButton?.focusedBackgroundColor = Constants.COLOR_FOLLOW_GREEN
-                            self.followButton?.focusedBackgroundEndColor = Constants.COLOR_FOLLOW_GREEN
-                            self.followButtonLabel?.text = "button.follow".l10n()
-                            self.isFollowing = false
-                        }
-                    }
-                })
-            }
+                    })
+                }
+            })
         }
     }
 
@@ -385,29 +399,29 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     @IBAction
     private func followButtonSelected(_ button: UIButton) {
         if let stream = self.stream {
-            if TwitchApi.isLoggedIn {
-                if isFollowing {
-                    TwitchApi.unfollowUser(id: stream.userId, callback: { success in
-                        if success {
-                            self.updateFollowStatus(loadCache: false)
-                        }
-                    })
+            TwitchApi.afterLogin(callback: { isLoggedIn in
+                if isLoggedIn {
+                    if self.isFollowing {
+                        TwitchApi.unfollowUser(id: stream.userId, callback: { success in
+                            if success {
+                                self.updateFollowStatus(loadCache: false)
+                            }
+                        })
+                    } else {
+                        TwitchApi.followUser(id: stream.userId, callback: { success in
+                            if success {
+                                self.updateFollowStatus(loadCache: false)
+                            }
+                        })
+                    }
+                } else {
+                    let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
+                            withIdentifier: "loginViewController") as! LoginViewController
+                    loginViewController.modalPresentationStyle = .blurOverFullScreen
+                    loginViewController.modalTransitionStyle = .crossDissolve
+                    self.present(loginViewController, animated: true)
                 }
-                else {
-                    TwitchApi.followUser(id: stream.userId, callback: { success in
-                        if success {
-                            self.updateFollowStatus(loadCache: false)
-                        }
-                    })
-                }
-            }
-            else {
-                let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
-                        withIdentifier: "loginViewController") as! LoginViewController
-                loginViewController.modalPresentationStyle = .blurOverFullScreen
-                loginViewController.modalTransitionStyle = .crossDissolve
-                self.present(loginViewController, animated: true)
-            }
+            })
         }
     }
 

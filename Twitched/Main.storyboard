@@ -215,7 +215,7 @@
         <!--Game List Controller-->
         <scene sceneID="wg7-f3-ORb">
             <objects>
-                <viewController title="Game List Controller" id="8rJ-Kc-sve" customClass="GameListViewController" customModule="Twitched" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="gameListVIewController" title="Game List Controller" useStoryboardIdentifierAsRestorationIdentifier="YES" id="8rJ-Kc-sve" customClass="PosterItemsListViewController" customModule="Twitched" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="L7p-HK-0SC"/>
                         <viewControllerLayoutGuide type="bottom" id="Djb-ko-YwX"/>
@@ -234,7 +234,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell contentMode="scaleToFill" misplaced="YES" restorationIdentifier="gameCollectionCell" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="gameCollectionCell" focusStyle="custom" rowHeight="500" id="DNN-CR-9OX" userLabel="gameCollectionCell" customClass="GameCollectionCell" customModule="Twitched" customModuleProvider="target">
+                                    <tableViewCell contentMode="scaleToFill" misplaced="YES" restorationIdentifier="posterItemCollectionCell" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="gameCollectionCell" focusStyle="custom" rowHeight="500" id="DNN-CR-9OX" userLabel="posterItemCollectionCell" customClass="PosterItemCollectionCell" customModule="Twitched" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="66" width="1740" height="500"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="conentView" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DNN-CR-9OX" id="Kpf-e9-7mz" userLabel="contentView">
@@ -259,7 +259,7 @@
                                                         <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                     </collectionViewFlowLayout>
                                                     <cells>
-                                                        <collectionViewCell opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="gameCell" reuseIdentifier="gameCell" id="S0n-bX-pgo" userLabel="gameCell" customClass="GameCell" customModule="Twitched" customModuleProvider="target">
+                                                        <collectionViewCell opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="posterItemCell" reuseIdentifier="gameCell" id="S0n-bX-pgo" userLabel="posterItemCell" customClass="PosterItemCell" customModule="Twitched" customModuleProvider="target">
                                                             <rect key="frame" x="0.0" y="0.0" width="280" height="424"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
@@ -345,6 +345,7 @@
                     <connections>
                         <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
                         <segue destination="8rJ-Kc-sve" kind="relationship" relationship="viewControllers" id="lzU-1b-eKA"/>
+                        <segue destination="GV7-C5-SPg" kind="relationship" relationship="viewControllers" id="lNE-Xc-III"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
@@ -843,6 +844,129 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ygb-L5-8ld" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+        <!--Community List Controller-->
+        <scene sceneID="B6q-j4-0s4">
+            <objects>
+                <viewController storyboardIdentifier="communityListViewController" title="Community List Controller" useStoryboardIdentifierAsRestorationIdentifier="YES" id="GV7-C5-SPg" customClass="PosterItemsListViewController" customModule="Twitched" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="idf-ow-ZXJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="auL-RR-3aQ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="DHA-rj-kB7">
+                        <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" restorationIdentifier="loadingIndicator" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="UrX-lY-S1B" userLabel="loadingIndicator">
+                                <rect key="frame" x="928" y="508" width="64" height="64"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
+                            <tableView contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="tableView" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="500" sectionHeaderHeight="66" sectionFooterHeight="66" translatesAutoresizingMaskIntoConstraints="NO" id="lkT-MR-dG5" userLabel="tableView">
+                                <rect key="frame" x="90" y="60" width="1740" height="960"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="separatorColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" misplaced="YES" restorationIdentifier="posterItemCollectionCell" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="gameCollectionCell" focusStyle="custom" rowHeight="500" id="jbN-UA-pGL" userLabel="posterItemCollectionCell" customClass="PosterItemCollectionCell" customModule="Twitched" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="66" width="1740" height="500"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="conentView" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jbN-UA-pGL" id="w98-Ed-n0v" userLabel="contentView">
+                                            <rect key="frame" x="0.0" y="0.0" width="1740" height="500"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="contentTitle" text="Games" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hvK-fx-ajV" userLabel="contentTitle">
+                                                    <rect key="frame" x="8" y="10" width="1712" height="46"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <collectionView multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="vPP-cC-Afj" userLabel="collectionView">
+                                                    <rect key="frame" x="8" y="76" width="1732" height="424"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="iay-ya-Tf4">
+                                                        <size key="itemSize" width="280" height="424"/>
+                                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                    </collectionViewFlowLayout>
+                                                    <cells>
+                                                        <collectionViewCell opaque="NO" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="posterItemCell" reuseIdentifier="gameCell" id="Cpw-Wf-DaJ" userLabel="posterItemCell" customClass="PosterItemCell" customModule="Twitched" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="280" height="424"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                                                <rect key="frame" x="0.0" y="0.0" width="280" height="424"/>
+                                                                <autoresizingMask key="autoresizingMask"/>
+                                                                <subviews>
+                                                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="thumbnail" image="Game Thumbnail Loading Image" adjustsImageWhenAncestorFocused="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H5e-3P-ZIW" userLabel="thumbnail">
+                                                                        <rect key="frame" x="20" y="20" width="240" height="320"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                    </imageView>
+                                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="gameTitle" text="Team Fortress 2" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Ca-Iy-Hrs" userLabel="gameTitle" customClass="MarqueeLabel" customModule="Twitched" customModuleProvider="target">
+                                                                        <rect key="frame" x="10" y="364" width="260" height="60"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                        <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="30"/>
+                                                                        <nil key="textColor"/>
+                                                                        <nil key="highlightedColor"/>
+                                                                        <userDefinedRuntimeAttributes>
+                                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="labelize" value="YES"/>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="scrollDuration">
+                                                                                <real key="value" value="8"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="fadeLength">
+                                                                                <real key="value" value="10"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                        </userDefinedRuntimeAttributes>
+                                                                        <variation key="userInterfaceStyle=dark">
+                                                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                        </variation>
+                                                                        <variation key="userInterfaceStyle=light">
+                                                                            <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </subviews>
+                                                            </view>
+                                                            <size key="customSize" width="280" height="424"/>
+                                                            <connections>
+                                                                <outlet property="thumbnail" destination="H5e-3P-ZIW" id="PUA-Cj-Kfa"/>
+                                                                <outlet property="title" destination="4Ca-Iy-Hrs" id="dpm-mJ-4Ac"/>
+                                                            </connections>
+                                                        </collectionViewCell>
+                                                    </cells>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="jbN-UA-pGL" id="zyn-Jp-7iF"/>
+                                                        <outlet property="delegate" destination="jbN-UA-pGL" id="JYW-Jg-G9D"/>
+                                                    </connections>
+                                                </collectionView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="collectionView" destination="vPP-cC-Afj" id="v5n-Xd-Q3U"/>
+                                            <outlet property="title" destination="hvK-fx-ajV" id="VeZ-iw-nbu"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="GV7-C5-SPg" id="K08-S3-KrD"/>
+                                    <outlet property="delegate" destination="GV7-C5-SPg" id="kZ5-4l-gdd"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="HVB-eD-Gf9"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Communities" id="ohI-DL-enc"/>
+                    <simulatedTabBarMetrics key="simulatedTopBarMetrics"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="loadCommunityData" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <outlet property="loadingIndicator" destination="UrX-lY-S1B" id="jFc-vI-0oF"/>
+                        <outlet property="tableView" destination="lkT-MR-dG5" id="KSW-gt-vlu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VBw-6Y-Uno" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
     </scenes>

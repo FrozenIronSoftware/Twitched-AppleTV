@@ -39,6 +39,8 @@
 "title.videos" = "Videos";
 "title.games" = "Games";
 "title.followed_games" = "Followed Games";
+"title.communities" = "Communities";
+"title.followed_communities" = "Followed Communities";
 
 /* Message
    Items in this group should be full sentences or paragraphs. */

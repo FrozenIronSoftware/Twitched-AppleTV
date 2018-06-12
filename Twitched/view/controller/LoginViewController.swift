@@ -22,7 +22,7 @@ class LoginViewController: UIViewController {
         statusTimer = Timer(timeInterval: 5, target: self, selector: #selector(self.checkLinkStatus(sender:)),
                 userInfo: nil, repeats: true)
         isRequestingStatus = false
-        TwitchApi.tryTimeLogIn(callback: { success in
+        TwitchApi.afterLogin(callback: { success in
             if !success {
                 self.requestLink()
             }
