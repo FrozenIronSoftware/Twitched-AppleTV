@@ -33,6 +33,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     private var requestingArchivedVideos: Bool = false
     private var requestingHighlightedVideos: Bool = false
     private var isFollowing: Bool = false
+    var dismissCompletion: () -> Void = {}
 
     /// Handle view loading
     override func viewDidLoad() {
@@ -78,6 +79,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
     /// Handle the presented controller being dismissed
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         super.dismiss(animated: flag, completion: completion)
+        self.dismissCompletion()
     }
 
     /// Set the fields to the appropriate values
@@ -416,6 +418,7 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                             }
                         })
                     }
+                    VideoGridViewController.needsFollowsUpdate = true
                 } else {
                     let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
                             withIdentifier: "loginViewController") as! LoginViewController

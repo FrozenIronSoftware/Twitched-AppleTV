@@ -45,13 +45,20 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             return loadFollowedStreams ? 500 : 40
         }
     }
+    public static var needsFollowsUpdate: Bool = false
+    private var shouldUpdate: Bool {
+        get {
+            return (lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL) ||
+                    VideoGridViewController.needsFollowsUpdate
+        }
+    }
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         os_log("VideoGridView will appear", type: .debug)
-        if lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL {
+        if self.shouldUpdate {
             populateCollectionViewWithReset()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
@@ -90,6 +97,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     private func populateCollectionViewWithReset() {
         page = 0
         isLoading = false
+        VideoGridViewController.needsFollowsUpdate = false
         populateCollectionView()
     }
 
@@ -243,6 +251,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             streamInfoViewController.setStream(stream)
             streamInfoViewController.modalPresentationStyle = .blurOverFullScreen
             streamInfoViewController.modalTransitionStyle = .crossDissolve
+            streamInfoViewController.dismissCompletion = {
+                if self.shouldUpdate {
+                    self.populateCollectionViewWithReset()
+                }
+            }
             self.present(streamInfoViewController, animated: true)
         }
     }
@@ -466,7 +479,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     @objc func applicationDidBecomeActive() {
         os_log("VideoGridView active", type: .debug)
         // Update the items if needed
-        if lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL {
+        if self.shouldUpdate {
             populateCollectionViewWithReset()
         }
         // Focus the active cell
