@@ -505,6 +505,28 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
         }
     }
 
+    /// Save stream
+    override func encodeRestorableState(with coder: NSCoder) {
+        super.encodeRestorableState(with: coder)
+        do {
+            coder.encode(try JSONEncoder().encode(stream), forKey: "stream")
+        }
+        catch {}
+    }
+
+    /// Set and update stream
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        do {
+            if let streamData: Data = coder.decodeObject(forKey: "stream") as? Data {
+                let stream = try JSONDecoder().decode(TwitchStream.self, from: streamData)
+                self.stream = stream
+            }
+        }
+        catch {}
+        setFieldData()
+    }
+
     private enum VideoType {
         case ARCHIVE, HIGHLIGHT, ALL
     }

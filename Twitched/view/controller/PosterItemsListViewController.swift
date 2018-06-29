@@ -274,4 +274,16 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
             reset()
         }
     }
+
+    /// Encode
+    override func encodeRestorableState(with coder: NSCoder) {
+        super.encodeRestorableState(with: coder)
+        coder.encode(loadCommunityData, forKey: "loadCommunityData")
+    }
+
+    /// Decode
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        loadCommunityData = coder.decodeBool(forKey: "loadCommunityData")
+    }
 }

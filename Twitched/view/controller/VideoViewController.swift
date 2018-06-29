@@ -285,8 +285,26 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         self.id = id
     }
 
-    override func restoreUserActivityState(_ activity: NSUserActivity) {
-        super.restoreUserActivityState(activity)
-        showApiErrorAlert()
+    /// Save stream
+    override func encodeRestorableState(with coder: NSCoder) {
+        super.encodeRestorableState(with: coder)
+        if let idType = idType {
+            coder.encode(idType.rawValue, forKey: "idType")
+        }
+        coder.encode(id, forKey: "id")
+        coder.encode(subTitle, forKey: "subTitle")
+        coder.encode(titleMeta, forKey: "titleMeta")
+        coder.encode(thumbnailUrl, forKey: "thumbnailUrl")
+        coder.encode(loadingTitle, forKey: "loadingTitle")
+    }
+
+    /// Load stream
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        id = coder.decodeObject(forKey: "id") as? String
+        subTitle = coder.decodeObject(forKey: "subTitle") as? String
+        titleMeta = coder.decodeObject(forKey: "titleMeta") as? String
+        thumbnailUrl = coder.decodeObject(forKey: "thumbnailUrl") as? String
+        loadingTitle = coder.decodeObject(forKey: "loadingTitle") as? String
     }
 }

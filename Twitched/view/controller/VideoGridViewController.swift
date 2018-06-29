@@ -499,4 +499,30 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return self.loadFollowedStreams ? 2 : 1;
     }
+
+    /// Encode
+    override func encodeRestorableState(with coder: NSCoder) {
+        super.encodeRestorableState(with: coder)
+        coder.encode(gameId, forKey: "gameId")
+        coder.encode(communityId, forKey: "communityId")
+        coder.encode(headerTitle, forKey: "headerTitle")
+        coder.encode(loadFollowedStreams, forKey: "loadFollowedStreams")
+    }
+
+    /// Decode
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        if let gameId = coder.decodeObject(forKey: "gameId") as? String {
+            self.gameId = gameId
+        }
+        if let communityId = coder.decodeObject(forKey: "communityId") as? String {
+            self.communityId = communityId
+        }
+        if let headerTitle = coder.decodeObject(forKey: "headerTitle") as? String {
+            self.headerTitle = headerTitle
+        }
+        if let loadFollowedStreams = coder.decodeObject(forKey: "loadFollowedStreams") as? Bool {
+            self.loadFollowedStreams = loadFollowedStreams
+        }
+    }
 }
