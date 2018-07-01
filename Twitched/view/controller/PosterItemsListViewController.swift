@@ -284,6 +284,8 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
     /// Decode
     override func decodeRestorableState(with coder: NSCoder) {
         super.decodeRestorableState(with: coder)
-        loadCommunityData = coder.decodeBool(forKey: "loadCommunityData")
+        if let loadCommunityData = coder.decodeObject(forKey: "loadCommunityData") as? Bool {
+            self.loadCommunityData = loadCommunityData
+        }
     }
 }
