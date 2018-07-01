@@ -731,6 +731,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="chat" translatesAutoresizingMaskIntoConstraints="NO" id="wbd-aY-bjb" userLabel="chat" customClass="ChatView" customModule="Twitched" customModuleProvider="target">
+                                <rect key="frame" x="-500" y="0.0" width="500" height="1080"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" notEnabled="YES"/>
+                                </accessibility>
+                            </view>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="loadingView" translatesAutoresizingMaskIntoConstraints="NO" id="6Ic-B1-EGe" userLabel="loadingView">
                                 <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -749,14 +757,31 @@
                                 </subviews>
                             </view>
                         </subviews>
+                        <gestureRecognizers/>
                         <viewLayoutGuide key="safeArea" id="AEv-4i-b3w"/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="UXS-x9-Kd0" appends="YES" id="hQz-el-foe"/>
+                            <outletCollection property="gestureRecognizers" destination="200-6e-ZJn" appends="YES" id="Keh-mC-WpX"/>
+                        </connections>
                     </view>
                     <connections>
+                        <outlet property="chat" destination="wbd-aY-bjb" id="iii-LA-wDp"/>
                         <outlet property="loadingIndicator" destination="cqr-bT-UIX" id="nq0-dp-GMW"/>
+                        <outlet property="loadingView" destination="6Ic-B1-EGe" id="6aF-n0-vR7"/>
                         <outlet property="titleLabel" destination="qqD-Uf-X3A" id="OR0-ZG-gsj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="stv-bJ-ocr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <swipeGestureRecognizer direction="left" id="UXS-x9-Kd0" userLabel="Left Swipe Gesture Recognizer">
+                    <connections>
+                        <action selector="didSwipeLeft:" destination="4PM-Uf-vhl" id="Vgk-Ro-4O2"/>
+                    </connections>
+                </swipeGestureRecognizer>
+                <swipeGestureRecognizer direction="right" id="200-6e-ZJn" userLabel="Right Swipe Gesture Recognizer">
+                    <connections>
+                        <action selector="didSwipeRight:" destination="4PM-Uf-vhl" id="dlT-Cg-Sfl"/>
+                    </connections>
+                </swipeGestureRecognizer>
             </objects>
         </scene>
         <!--Login View Controller-->

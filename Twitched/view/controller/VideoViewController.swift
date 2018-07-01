@@ -12,6 +12,8 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
 
     @IBOutlet private weak var loadingIndicator: UIActivityIndicatorView?
     @IBOutlet private weak var titleLabel: UILabel?
+    @IBOutlet private weak var chat: ChatView?
+    @IBOutlet private weak var loadingView: UIView?
     private var idType: TwitchApi.VideoType?
     private var id: String?
     private var titleMeta: String?
@@ -19,7 +21,11 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     private var loadingTitle: String?
     private var thumbnail: UIImage?
     private var thumbnailUrl: String?
+    private var streamerName: String = ""
+    private var chatState: ChatState = .HIDDEN
     private var player: AVPlayer?
+    private var playerViewController: AVPlayerViewController?
+    private var playerLayer: AVPlayerLayer?
 
     /// Loaded
     override func viewDidLoad() {
@@ -140,6 +146,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
 
     /// Play a video
     private func playVideo(_ url: String) {
+        // Construct player
         let playerAsset: AVURLAsset =  AVURLAsset(url: URL(
                 string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!, options: [
             "AVURLAssetHTTPHeaderFieldsKey": TwitchApi.generateHeaders() as Any
@@ -147,17 +154,34 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         let playerItem: AVPlayerItem = AVPlayerItem(asset: playerAsset)
         playerItem.externalMetadata = generateMetadata()
         let player: AVPlayer = AVPlayer(playerItem: playerItem)
+        let playerLayer: AVPlayerLayer = AVPlayerLayer(player: player)
+        playerLayer.frame = self.view.frame
+        playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+        // Blur
+        let blurEffect = UIBlurEffect(style: .regular)
+        let effectView = UIVisualEffectView(effect: blurEffect)
+        effectView.frame = self.view.frame
+        effectView.isOpaque = false
+        effectView.layer.isOpaque = false
+        effectView.layer.opacity = 1
+        // Controller
         let playerViewController: AVPlayerViewController = AVPlayerViewController()
         playerViewController.restorationIdentifier = "playerViewController"
         playerViewController.player = player
-        playerViewController.view.frame = self.view.bounds
+        playerViewController.view.frame = self.view.frame
         playerViewController.allowedSubtitleOptionLanguages = [""]
         playerViewController.isSkipBackwardEnabled = false
         playerViewController.isSkipForwardEnabled = false
+        playerViewController.contentOverlayView?.addSubview(loadingView!)
+        playerViewController.contentOverlayView?.backgroundColor = .clear
+        playerViewController.contentOverlayView?.addSubview(effectView)
+        playerViewController.contentOverlayView?.layer.addSublayer(playerLayer)
         self.addChildViewController(playerViewController)
         self.view.addSubview(playerViewController.view)
         playerViewController.didMove(toParentViewController: self)
         playerViewController.delegate = self
+        self.playerViewController = playerViewController
+        self.playerLayer = playerLayer
         // Add observers
         self.player = player
         player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: .new, context: nil)
@@ -169,6 +193,11 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(handleVideoFinish),
                 name: .AVPlayerItemDidPlayToEndTime, object: player)
         player.play()
+    }
+
+    /// Set the streamer login
+    func setStreamerName(_ login: String) {
+        self.streamerName = login
     }
 
     /// Handle video finish
@@ -289,22 +318,134 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     override func encodeRestorableState(with coder: NSCoder) {
         super.encodeRestorableState(with: coder)
         if let idType = idType {
-            coder.encode(idType.rawValue, forKey: "idType")
+            coder.encode(idType.rawValue, forKey: "idTypeRaw")
         }
         coder.encode(id, forKey: "id")
         coder.encode(subTitle, forKey: "subTitle")
         coder.encode(titleMeta, forKey: "titleMeta")
         coder.encode(thumbnailUrl, forKey: "thumbnailUrl")
         coder.encode(loadingTitle, forKey: "loadingTitle")
+        coder.encode(streamerName, forKey: "streamerName")
+        coder.encode(chatState.rawValue, forKey: "chatStateRaw")
     }
 
     /// Load stream
     override func decodeRestorableState(with coder: NSCoder) {
         super.decodeRestorableState(with: coder)
-        id = coder.decodeObject(forKey: "id") as? String
-        subTitle = coder.decodeObject(forKey: "subTitle") as? String
-        titleMeta = coder.decodeObject(forKey: "titleMeta") as? String
-        thumbnailUrl = coder.decodeObject(forKey: "thumbnailUrl") as? String
-        loadingTitle = coder.decodeObject(forKey: "loadingTitle") as? String
+        if let id = coder.decodeObject(forKey: "id") as? String,
+           let idTypeRaw = coder.decodeObject(forKey: "idTypeRaw") as? Int,
+           let videoType = TwitchApi.VideoType(rawValue: idTypeRaw) {
+            setId(type: videoType, id)
+        }
+        if let subTitle = coder.decodeObject(forKey: "subTitle") as? String {
+            setSubTitle(subTitle)
+        }
+        if let titleMeta = coder.decodeObject(forKey: "titleMeta") as? String {
+            setTitle(titleMeta)
+        }
+        if let thumbnailUrl = coder.decodeObject(forKey: "thumbnailUrl") as? String {
+            setThumbnailUrl(thumbnailUrl)
+        }
+        if let loadingTitle = coder.decodeObject(forKey: "loadingTitle") as? String {
+            setLoadingTitle(loadingTitle)
+        }
+        if let streamerName = coder.decodeObject(forKey: "streamerName") as? String {
+            setStreamerName(streamerName)
+        }
+        if let chatStateRaw = coder.decodeObject(forKey: "chatStateRaw") as? Int{
+            var calls = 0
+            while calls <= chatStateRaw {
+                showChat()
+                calls += 1
+            }
+        }
+        loadStreamInfo()
     }
+
+    /// Handle a swipe left action
+    @IBAction func didSwipeLeft(_ sender: UISwipeGestureRecognizer) {
+        hideChat()
+    }
+
+    /// Hide the chat
+    /// Each call to this function will step down the state of the chat
+    /// Theatre -> Overlay -> Hidden
+    private func hideChat() {
+        switch chatState {
+            case .THEATRE:
+                chatState = .OVERLAY
+                UIView.animate(withDuration: 0.2, animations: {
+                    if let playerLayer = self.playerLayer {
+                        playerLayer.frame = self.view.frame
+                    }
+                })
+            case .OVERLAY:
+                chatState = .HIDDEN
+                UIView.animate(withDuration: 0.2, animations: {
+                    if let chat = self.chat {
+                        chat.frame = chat.frame.offsetBy(dx: -chat.frame.width, dy: 0)
+                    }
+                }, completion: { _ in
+                    self.chat?.disconnect()
+                })
+            case .HIDDEN:
+                break
+        }
+    }
+
+    /// Handle a swift right action
+    @IBAction func didSwipeRight(_ sender: UISwipeGestureRecognizer) {
+        showChat()
+    }
+
+    /// Show the chat
+    private func showChat() {
+        if let idType = idType {
+            switch idType {
+            case .STREAM:
+                showStreamChat()
+            case .VIDEO:
+                break
+            }
+        }
+    }
+
+    /// Show the stream chat
+    /// Each call to this function will step up the state of the chat
+    /// Hidden -> Overlay -> Theatre
+    private func showStreamChat() {
+        switch chatState {
+            case .HIDDEN:
+                chatState = .OVERLAY
+                UIView.animate(withDuration: 0.2, animations: {
+                    if let chat = self.chat {
+                        self.view.bringSubview(toFront: chat)
+                        chat.frame = chat.frame.offsetBy(dx: chat.frame.width, dy: 0)
+                    }
+                }, completion: { _ in
+                    if !self.streamerName.isEmpty {
+                        self.chat?.connect(self.streamerName)
+                    }
+                })
+            case .OVERLAY:
+                chatState = .THEATRE
+                UIView.animate(withDuration: 0.2, animations: {
+                    if let playerLayer = self.playerLayer, let chat = self.chat {
+                        let width = self.view.frame.width - chat.frame.width
+                        let height = 9 * width / 16
+                        playerLayer.frame = CGRect(
+                                x: chat.frame.width,
+                                y: (self.view.frame.height - height) / 2,
+                                width: width,
+                                height: height)
+                    }
+                })
+            case .THEATRE:
+                break
+        }
+    }
+}
+
+private enum ChatState: Int {
+    case HIDDEN, OVERLAY, THEATRE
 }

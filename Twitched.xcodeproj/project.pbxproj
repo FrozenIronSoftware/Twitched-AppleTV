@@ -25,12 +25,14 @@
 		520FF68F75C2016EF610F9D9 /* TwitchStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */; };
 		520FF6F7669C555E8D2A63BE /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF862DBB6424CEE37E5CE /* TwitchApi.swift */; };
 		520FF6FEB48F6D5C1614B832 /* OnlineOfflineCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */; };
+		520FF776A0797F05F15CEA49 /* IrcClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF9FE6BDD847F2F44457D /* IrcClient.swift */; };
 		520FF804ACF532693974C696 /* TwitchedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4B0596F638301A02309 /* TwitchedUITests.swift */; };
 		520FF82BB0D673B539B1E69F /* L10nExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF11965F219593280BA42 /* L10nExtension.swift */; };
 		520FF84CF89D0A0C1B5D8F19 /* FocusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFF1C539334046C290FB /* FocusableView.swift */; };
 		520FF8510B3CAD185D2579C3 /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFF6E97F17AFD0D0A3DE7 /* VideoViewController.swift */; };
 		520FF9B4F1E02732E9EDAF6F /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF6427EC66C5B6082B492 /* NavigationController.swift */; };
 		520FFA746F11A2758F17B9A5 /* PosterItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAF8AC6A1DEEDF17E5B5 /* PosterItemCell.swift */; };
+		520FFAA589A412D5AF2378EB /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF3265086C75022768569 /* ChatView.swift */; };
 		520FFAB8FE3AAA315059C4FC /* TwitchUserName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFEF5CCB6971AEB1AD7E6 /* TwitchUserName.swift */; };
 		520FFB1BEFF8EAA4824BC42C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 520FFD6A32A7BCF45D418E01 /* Assets.xcassets */; };
 		520FFBADF52B23EFE82BBBF4 /* TwitchCommunity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF451309219761ACFBC10 /* TwitchCommunity.swift */; };
@@ -77,6 +79,7 @@
 		520FF08CAA6201072A651031 /* TwitchAccessToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchAccessToken.swift; path = Twitched/data/json/TwitchAccessToken.swift; sourceTree = SOURCE_ROOT; };
 		520FF11965F219593280BA42 /* L10nExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = L10nExtension.swift; sourceTree = "<group>"; };
 		520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchStream.swift; sourceTree = "<group>"; };
+		520FF3265086C75022768569 /* ChatView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoGridViewController.swift; sourceTree = "<group>"; };
 		520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnlineOfflineCount.swift; sourceTree = "<group>"; };
 		520FF451309219761ACFBC10 /* TwitchCommunity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchCommunity.swift; sourceTree = "<group>"; };
@@ -99,6 +102,7 @@
 		520FF9533175CC293F41A2AA /* TwitchGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchGame.swift; path = Twitched/data/json/TwitchGame.swift; sourceTree = SOURCE_ROOT; };
 		520FF98C71FABF603A7C49B4 /* ImageUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageUtil.swift; sourceTree = "<group>"; };
 		520FF9F84BCACF61B53F185A /* secret.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secret.json; sourceTree = "<group>"; };
+		520FF9FE6BDD847F2F44457D /* IrcClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IrcClient.swift; sourceTree = "<group>"; };
 		520FFA0F9BF6978B0A704F2B /* VideoOnDemandCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoOnDemandCell.swift; sourceTree = "<group>"; };
 		520FFA67BC34B13DDDB537C9 /* VideoCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCollectionCell.swift; sourceTree = "<group>"; };
 		520FFAEA2D592121AE726287 /* PosterItemCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PosterItemCollectionCell.swift; sourceTree = "<group>"; };
@@ -307,6 +311,7 @@
 				520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */,
 				520FF9533175CC293F41A2AA /* TwitchGame.swift */,
 				520FF863F95BC41252C56E2F /* TwitchGameFollowStatus.swift */,
+				520FF9FE6BDD847F2F44457D /* IrcClient.swift */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -330,6 +335,7 @@
 				520FF6AC6E4563CE16B9D11D /* FocusableTextView.swift */,
 				520FFD9A55532354EB519089 /* FocusableLabel.swift */,
 				520FFB683CD3F010074A61C2 /* CallbackActionHandler.swift */,
+				520FF3265086C75022768569 /* ChatView.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -562,6 +568,8 @@
 				520FFBADF52B23EFE82BBBF4 /* TwitchCommunity.swift in Sources */,
 				520FF26813D042345BB04656 /* FocusGuideRepresentation.swift in Sources */,
 				520FF6FEB48F6D5C1614B832 /* OnlineOfflineCount.swift in Sources */,
+				520FFAA589A412D5AF2378EB /* ChatView.swift in Sources */,
+				520FF776A0797F05F15CEA49 /* IrcClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

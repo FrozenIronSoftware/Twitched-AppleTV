@@ -163,6 +163,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                         stream.userName != nil ? (stream.userName?.displayName)! : "",
                         stream.gameName != nil ? stream.gameName! : ""
                     ]))
+                    if let userName = stream.userName {
+                        videoViewController.setStreamerName(userName.login)
+                    }
                 case .VIDEO:
                     if let id = stream.id {
                         videoViewController.setId(type: .VIDEO, id)
