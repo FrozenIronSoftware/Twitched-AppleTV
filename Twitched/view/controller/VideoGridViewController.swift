@@ -269,16 +269,20 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             if let header = collectionView.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
                     at: IndexPath(item: 0, section: 0)) {
                 if indexPath.section == 0 && (indexPath.item == 0 || (indexPath.item == 3 && isFollowButtonEnabled)) {
-                    UIView.animate(withDuration: 0.2, animations: {
-                        header.bounds = (self.initialHeaderBounds?.offsetBy(dx: 1, dy: 20))!
-                    })
+                    if let initialHeaderBounds =  self.initialHeaderBounds {
+                        UIView.animate(withDuration: 0.2, animations: {
+                            header.bounds = initialHeaderBounds.offsetBy(dx: 0, dy: 20)
+                        })
+                    }
                 }
                 else if let previousIndexPath = context.previouslyFocusedIndexPath {
                     if previousIndexPath.section == 0 && (previousIndexPath.item == 0 ||
                             (previousIndexPath.item == 3 && isFollowButtonEnabled)) {
-                        UIView.animate(withDuration: 0.2, animations: {
-                            header.bounds = self.initialHeaderBounds!
-                        })
+                        if let initialHeaderBounds =  self.initialHeaderBounds {
+                            UIView.animate(withDuration: 0.2, animations: {
+                                header.bounds = initialHeaderBounds
+                            })
+                        }
                     }
                 }
             }
