@@ -5,6 +5,7 @@
 
 import UIKit
 import Alamofire
+import AlamofireImage
 
 class VideoOnDemandCell: UICollectionViewCell {
     @IBOutlet private weak var title: MarqueeLabel?
@@ -14,7 +15,7 @@ class VideoOnDemandCell: UICollectionViewCell {
             self.title?.text = self.videoTitle
         }
     }
-    var thumbnailRequest: DataRequest?
+    var thumbnailRequest: RequestReceipt?
     var videoThumbnail: String = "" {
         didSet {
             let height: Int = Int((self.thumbnail?.bounds.width)!)
@@ -31,7 +32,7 @@ class VideoOnDemandCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         if let thumbnailRequest = thumbnailRequest {
-            thumbnailRequest.cancel()
+            thumbnailRequest.request.cancel()
         }
         thumbnailRequest = nil
         thumbnail?.image = UIImage(named: Constants.IMAGE_LOADING_VIDEO_THUMBNAIL)

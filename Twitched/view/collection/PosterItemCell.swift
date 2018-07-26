@@ -5,11 +5,12 @@
 
 import UIKit
 import Alamofire
+import AlamofireImage
 
 class PosterItemCell: UICollectionViewCell {
     @IBOutlet private weak var title: MarqueeLabel?
     @IBOutlet private weak var thumbnail: UIImageView?
-    private var thumbnailRequest: DataRequest?
+    private var thumbnailRequest: RequestReceipt?
     var item: Any? {
         didSet {
             if let game: TwitchGame = item as? TwitchGame {
@@ -33,7 +34,7 @@ class PosterItemCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         if let thumbnailRequest = thumbnailRequest {
-            thumbnailRequest.cancel()
+            thumbnailRequest.request.cancel()
         }
         thumbnailRequest = nil
         thumbnail?.image = UIImage(named: Constants.IMAGE_LOADING_GAME_THUMBNAIL)

@@ -22,7 +22,17 @@ class TwitchApi {
             return TwitchApi.tokenValidation != nil && TwitchApi.accessToken != nil
         }
     }
-    private static var accessToken: TwitchAccessToken?
+    public static var accessToken: TwitchAccessToken?
+    public static var userLogin: String? {
+        get {
+            if let tokenValidation = TwitchApi.tokenValidation {
+                return tokenValidation.login
+            }
+            else {
+                return nil
+            }
+        }
+    }
     private static var tokenValidation: TwitchTokenValidation?
     public static var userId: String {
         get {
@@ -36,6 +46,7 @@ class TwitchApi {
     }
     private static var lastLoginTime: TimeInterval = 0
     private static var isLoggingIn = false
+    public static var chatBadges: TwitchBadges?
 
     /// Static only class
     private init() {}
@@ -205,6 +216,29 @@ class TwitchApi {
         // Read stored credentials
         if !isLoggedIn {
             log_in()
+        }
+        // Get badge data
+        getBadges()
+    }
+
+    /// Get global twitch badges
+    private static func getBadges() {
+        let url: String = "https://badges.twitch.tv/v1/badges/global/display"
+        request(url, headers: ["User-Agent": generateUserAgent()]).validate().responseData { response in
+            switch response.result {
+                case .success:
+                    do {
+                        let data: TwitchBadges = try JSONDecoder().decode(TwitchBadges.self,
+                                from: response.result.value!)
+                        TwitchApi.chatBadges = data
+                    }
+                    catch {
+                        os_log("Failed to parse Twitch badges JSON", type: .debug)
+                        print(error)
+                    }
+                case .failure:
+                    os_log("Failed to fetch Twitch badges", type: .debug)
+            }
         }
     }
 
@@ -599,7 +633,8 @@ class TwitchApi {
     static func generateHeaders() -> HTTPHeaders {
         var headers: HTTPHeaders = [
             "Client-ID": CLIENT_ID,
-            "X-Twitched-Version": Constants.VERSION
+            "X-Twitched-Version": Constants.VERSION,
+            "User-Agent": generateUserAgent()
         ]
         if let accessToken: TwitchAccessToken = TwitchApi.accessToken {
             if let accessTokenString: String = accessToken.accessToken {
@@ -607,6 +642,11 @@ class TwitchApi {
             }
         }
         return headers
+    }
+
+    /// Return the Twitched user agent string
+    private static func generateUserAgent() -> String {
+        return String(format: "TwitchedAppleTV/%@ (Swift)", Constants.VERSION)
     }
 
     /// Request users from the API

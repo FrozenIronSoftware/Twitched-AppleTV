@@ -63,6 +63,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         loadStreamInfo()
+        player?.play()
     }
 
     /// Start the load process
@@ -131,7 +132,8 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
 
     /// Fetch the thumbnal and play the video
     private func fetchThumbnailThenPlayVideo(_ url: String) {
-        if let thumbnailUrl: String = self.thumbnailUrl {
+        // TODO show loading thumbnail
+        /*if let thumbnailUrl: String = self.thumbnailUrl {
             ImageUtil.imageFromUrl(url: thumbnailUrl, completion: { response in
                 if let image: UIImage = response {
                     self.thumbnail = image
@@ -139,9 +141,9 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
                 self.playVideo(url)
             })
         }
-        else {
+        else {*/
             playVideo(url)
-        }
+        //}
     }
 
     /// Play a video
@@ -417,6 +419,10 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         switch chatState {
             case .HIDDEN:
                 chatState = .OVERLAY
+                if let chat = self.chat {
+                    chat.isHidden = false
+                    chat.layer.zPosition = .greatestFiniteMagnitude
+                }
                 UIView.animate(withDuration: 0.2, animations: {
                     if let chat = self.chat {
                         self.view.bringSubview(toFront: chat)

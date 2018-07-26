@@ -731,7 +731,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="chat" translatesAutoresizingMaskIntoConstraints="NO" id="wbd-aY-bjb" userLabel="chat" customClass="ChatView" customModule="Twitched" customModuleProvider="target">
+                            <view hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="chat" translatesAutoresizingMaskIntoConstraints="NO" id="wbd-aY-bjb" userLabel="chat" customClass="ChatView" customModule="Twitched" customModuleProvider="target">
                                 <rect key="frame" x="-500" y="0.0" width="500" height="1080"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.40000000000000002" colorSpace="custom" customColorSpace="sRGB"/>

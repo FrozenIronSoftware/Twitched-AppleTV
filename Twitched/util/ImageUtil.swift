@@ -5,8 +5,11 @@
 
 import UIKit
 import Alamofire
+import AlamofireImage
 
 class ImageUtil {
+    public static let imageDownloader: ImageDownloader = ImageDownloader()
+
     enum Alignment: Int {
         case LEFT = 0, RIGHT = 1, TOP = 2, BOTTOM = 3
     }
@@ -49,25 +52,20 @@ class ImageUtil {
         return expandedImage
     }
 
-    class func imageFromUrl(url: String, completion: @escaping (UIImage?) -> Void) {
-        request(url).responseData(completionHandler: { response in
-            if let data: Data = response.result.value {
-                completion(UIImage(data: data))
-            }
-            else {
-                completion(nil)
-            }
-        })
+    /// Try get a UI image from a URL
+    class func imageFromUrl(url: String, completion: @escaping (UIImage?) -> Void) -> RequestReceipt? {
+        return imageDownloader.download(URLRequest(url: URL(string: url)!)) { response in
+            completion(response.result.value)
+        }
     }
 }
 
 extension UIImageView {
     /// Attempt to set the image to the one contained at the URL
     /// This performs an async request and will set the image to an error placeholder if an error is encountered
-    func setUrl(_ url: String, errorImageName: String? = nil) -> DataRequest {
-        return request(url).responseData { response in
-            if let data = response.result.value {
-                let image = UIImage(data: data)
+    func setUrl(_ url: String, errorImageName: String? = nil) -> RequestReceipt? {
+        return ImageUtil.imageDownloader.download(URLRequest(url: URL(string: url)!)) { response in
+            if let image = response.result.value {
                 self.image = image
             }
             else {
@@ -79,5 +77,37 @@ extension UIImageView {
                 }
             }
         }
+    }
+}
+
+extension UIImage {
+    /// Attempt to download an image and return a UIImage with its data
+    static func loadFromUrl(_ url: String, completion: @escaping (UIImage?) -> Void) -> RequestReceipt? {
+        return ImageUtil.imageDownloader.download(URLRequest(url: URL(string: url)!)) { response in
+            completion(response.result.value)
+        }
+    }
+
+    /// Attempt to download all urls as images and return a dictionary with keys set to the initial url passed
+    static func loadAllFromUrl(urls: Array<String>, errorImageName: String? = nil,
+                        completion: @escaping (Dictionary<String, UIImage?>) -> Void) -> Array<RequestReceipt> {
+        var dataRequests: Array<RequestReceipt> = Array()
+        var images: Dictionary<String, UIImage> = Dictionary()
+        for url in urls {
+            if let requestReceipt = loadFromUrl(url, completion: { image in
+                if let image = image {
+                    images[url] = image
+                }
+                else {
+                    images[url] = nil
+                }
+                if images.count == urls.count {
+                    completion(images)
+                }
+            }) {
+                dataRequests.append(requestReceipt)
+            }
+        }
+        return dataRequests
     }
 }
