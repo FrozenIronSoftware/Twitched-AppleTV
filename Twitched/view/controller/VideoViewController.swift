@@ -132,8 +132,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
 
     /// Fetch the thumbnal and play the video
     private func fetchThumbnailThenPlayVideo(_ url: String) {
-        // TODO show loading thumbnail
-        /*if let thumbnailUrl: String = self.thumbnailUrl {
+        if let thumbnailUrl: String = self.thumbnailUrl {
             ImageUtil.imageFromUrl(url: thumbnailUrl, completion: { response in
                 if let image: UIImage = response {
                     self.thumbnail = image
@@ -141,9 +140,9 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
                 self.playVideo(url)
             })
         }
-        else {*/
+        else {
             playVideo(url)
-        //}
+        }
     }
 
     /// Play a video
