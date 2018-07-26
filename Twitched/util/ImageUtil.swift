@@ -54,7 +54,7 @@ class ImageUtil {
 
     /// Try get a UI image from a URL
     class func imageFromUrl(url: String, completion: @escaping (UIImage?) -> Void) -> RequestReceipt? {
-        return imageDownloader.download(URLRequest(url: URL(string: url)!)) { response in
+        return imageDownloader.download(URLRequest(url: URL(safe: url))) { response in
             completion(response.result.value)
         }
     }
@@ -64,7 +64,7 @@ extension UIImageView {
     /// Attempt to set the image to the one contained at the URL
     /// This performs an async request and will set the image to an error placeholder if an error is encountered
     func setUrl(_ url: String, errorImageName: String? = nil) -> RequestReceipt? {
-        return ImageUtil.imageDownloader.download(URLRequest(url: URL(string: url)!)) { response in
+        return ImageUtil.imageDownloader.download(URLRequest(url: URL(safe: url))) { response in
             if let image = response.result.value {
                 self.image = image
             }
@@ -83,7 +83,7 @@ extension UIImageView {
 extension UIImage {
     /// Attempt to download an image and return a UIImage with its data
     static func loadFromUrl(_ url: String, completion: @escaping (UIImage?) -> Void) -> RequestReceipt? {
-        return ImageUtil.imageDownloader.download(URLRequest(url: URL(string: url)!)) { response in
+        return ImageUtil.imageDownloader.download(URLRequest(url: URL(safe: url))) { response in
             completion(response.result.value)
         }
     }
@@ -109,5 +109,16 @@ extension UIImage {
             }
         }
         return dataRequests
+    }
+}
+
+extension URL {
+    init(safe url: String) {
+        if let _url = URL(string: url) {
+            self = _url
+        }
+        else {
+            self = URL(string: "https://localhost/404.png")!
+        }
     }
 }
