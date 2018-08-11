@@ -161,13 +161,14 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         let playerLayer: AVPlayerLayer = AVPlayerLayer(player: player)
         playerLayer.frame = self.view.frame
         playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        // Blur
-        let blurEffect = UIBlurEffect(style: .regular)
-        let effectView = UIVisualEffectView(effect: blurEffect)
-        effectView.frame = self.view.frame
-        effectView.isOpaque = false
-        effectView.layer.isOpaque = false
-        effectView.layer.opacity = 1
+        // Background view
+        let backgroundView: UIView = UIView(frame: self.view.frame)
+        if self.traitCollection.userInterfaceStyle == UIUserInterfaceStyle.light {
+            backgroundView.backgroundColor = UIColor.lightGray
+        }
+        else {
+            backgroundView.backgroundColor = UIColor(red: 31/255, green: 32/255, blue: 33/255, alpha: 1)
+        }
         // Controller
         let playerViewController: AVPlayerViewController = AVPlayerViewController()
         playerViewController.restorationIdentifier = "playerViewController"
@@ -178,7 +179,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         playerViewController.isSkipForwardEnabled = false
         playerViewController.contentOverlayView?.addSubview(loadingView!)
         playerViewController.contentOverlayView?.backgroundColor = .clear
-        playerViewController.contentOverlayView?.addSubview(effectView)
+        playerViewController.contentOverlayView?.addSubview(backgroundView)
         playerViewController.contentOverlayView?.layer.addSublayer(playerLayer)
         self.addChildViewController(playerViewController)
         self.view.addSubview(playerViewController.view)
