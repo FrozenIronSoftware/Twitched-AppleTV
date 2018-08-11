@@ -15,6 +15,7 @@ class Constants {
     public static let IMAGE_UNFOLLOW_BUTTON: String = "Unfollow Button"
 
     public static let VERSION: String = "1.5"
+    public static let NAME: String = "Twitched"
 
     public static let COLOR_FOLLOW_GREEN: UIColor = UIColor(red: 20/255, green: 184/255, blue: 102/255, alpha: 1)
     public static let COLOR_FOLLOW_RED: UIColor = UIColor(red: 165/255, green: 13/255, blue: 13/255, alpha: 1)

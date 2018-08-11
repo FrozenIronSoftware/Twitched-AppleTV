@@ -49,6 +49,8 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         self.followedItemsPage = 0
         self.topItemsLoading = false
         self.followedItemsLoading = false
+        self.topItems = []
+        self.followedItems = []
         if PosterItemsListViewController.needsGameUpdate && !self.loadCommunityData {
             PosterItemsListViewController.needsGameUpdate = false
         }
@@ -57,9 +59,13 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         }
         loadTopItems(completion: {
             self.loadFollowedItems(completion: {
-                self.lastUpdateTime = Date().timeIntervalSince1970
-                self.tableView?.reloadData()
-                self.loadingIndicator?.stopAnimating()
+                if self.topItems.count > 0 {
+                    self.lastUpdateTime = Date().timeIntervalSince1970
+                }
+                DispatchQueue.main.async(execute: {
+                    self.tableView?.reloadData()
+                    self.loadingIndicator?.stopAnimating()
+                })
             })
         })
     }
@@ -191,7 +197,9 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         }
         cell.callbackAction = onCollectionCellAction
         cell.indexPath = indexPath
-        cell.collectionView?.reloadData()
+        DispatchQueue.main.async(execute: {
+            cell.collectionView?.reloadData()
+        })
         return cell
     }
 

@@ -79,6 +79,21 @@ class TwitchApi {
         }
     }
 
+    /// Log out
+    static func logOut() {
+        DispatchQueue.global().async(qos: .background) {
+            while isLoggingIn {}
+            let cloud = NSUbiquitousKeyValueStore.default
+            cloud.removeObject(forKey: TwitchApi.ACCESS_TOKEN_KEY)
+            self.tokenValidation = nil
+            self.accessToken = nil
+            self.lastLoginTime = 0
+            PosterItemsListViewController.needsCommunityUpdate = true
+            PosterItemsListViewController.needsGameUpdate = true
+            VideoGridViewController.needsFollowsUpdate = true
+        }
+    }
+
     /// Check the last login time and verify the token
     static func tryTimeLogIn(callback: @escaping (Bool) -> Void = {_ in}) {
         if (!isLoggedIn) || Date().timeIntervalSince1970 - lastLoginTime >= LOGIN_INTERVAL {
@@ -256,6 +271,9 @@ class TwitchApi {
             self.isLoggingIn = false
             if status {
                 self.lastLoginTime = Date().timeIntervalSince1970
+                PosterItemsListViewController.needsCommunityUpdate = true
+                PosterItemsListViewController.needsGameUpdate = true
+                VideoGridViewController.needsFollowsUpdate = true
             }
             callback(status)
         }
@@ -549,11 +567,19 @@ class TwitchApi {
 
     /// Get HLS url for a stream
     static func getHlsUrl(type: VideoType, id: String) -> String {
+        let cloud = NSUbiquitousKeyValueStore.default
+        let qualityArray = cloud.array(forKey: SettingsViewController.TWITCH_QUALITY_KEY)
+        var quality = "1080p"
+        if let qualityArray: Array<String> = qualityArray as? Array<String> {
+            if qualityArray.count > 0 && qualityArray[0] != "auto" {
+                quality = qualityArray[0]
+            }
+        }
         switch type {
             case .STREAM:
-                return String(format: "%@/twitch/hls/60/1080p/ATV/:%@.m3u8", arguments: [API, id])
+                return String(format: "%@/twitch/hls/60/%@/ATV/:%@.m3u8", arguments: [API, quality, id])
             case .VIDEO:
-                return String(format: "%@/twitch/vod/60/1080p/ATV/%@.m3u8", arguments: [API, id])
+                return String(format: "%@/twitch/vod/60/%@/ATV/%@.m3u8", arguments: [API, quality, id])
         }
     }
 
@@ -606,9 +632,13 @@ class TwitchApi {
 
     /// Request stream data from the API
     static func getStreams(parameters: Parameters, callback: @escaping (Array<TwitchStream>?) -> Void) {
+        // Add lang data
+        var params = parameters
+        params.updateValue(getEnabledLanguages(), forKey: "language")
+        // Request
         let url: String = API_HELIX + "/streams"
         os_log("Get request to %{public}@", url)
-        request(url, parameters: parameters, headers: generateHeaders()).validate().responseData { response in
+        request(url, parameters: params, headers: generateHeaders()).validate().responseData { response in
             switch response.result {
             case .success:
                 do {
@@ -627,6 +657,19 @@ class TwitchApi {
                 callback(nil)
             }
         }
+    }
+
+    /// Returns a list of enabled languages
+    private class func getEnabledLanguages() -> Array<String> {
+        let cloud = NSUbiquitousKeyValueStore.default
+        let langs = cloud.array(forKey: SettingsViewController.TWITCH_LANG_KEY)
+        if let langs: Array<String> = langs as? Array<String> {
+            if langs.contains("all") {
+                return Array()
+            }
+            return langs
+        }
+        return Array()
     }
 
     /// Generate headers with Twitched client ID and Twitch user OAuth token (if the token is available)

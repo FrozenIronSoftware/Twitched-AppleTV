@@ -93,6 +93,10 @@ extension UIImage {
                         completion: @escaping (Dictionary<String, UIImage?>) -> Void) -> Array<RequestReceipt> {
         var dataRequests: Array<RequestReceipt> = Array()
         var images: Dictionary<String, UIImage> = Dictionary()
+        if urls.count == 0 {
+            completion(images)
+            return dataRequests
+        }
         for url in urls {
             if let requestReceipt = loadFromUrl(url, completion: { image in
                 if let image = image {

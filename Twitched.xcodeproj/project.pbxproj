@@ -24,6 +24,7 @@
 		520FF63D597400138B8B6944 /* PosterItemCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAEA2D592121AE726287 /* PosterItemCollectionCell.swift */; };
 		520FF66FB9429995890AF38D /* TwitchUserFollow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF7231B6664B0908FACEC /* TwitchUserFollow.swift */; };
 		520FF68F75C2016EF610F9D9 /* TwitchStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */; };
+		520FF6F4973900423DE53D85 /* MultipleChoiceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAAAAE59D39E51C9C6DB /* MultipleChoiceListViewController.swift */; };
 		520FF6F7669C555E8D2A63BE /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF862DBB6424CEE37E5CE /* TwitchApi.swift */; };
 		520FF6FEB48F6D5C1614B832 /* OnlineOfflineCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */; };
 		520FF72848185E25550DD4A0 /* Emote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFE937EA468E2DBA87DB /* Emote.swift */; };
@@ -32,6 +33,7 @@
 		520FF82BB0D673B539B1E69F /* L10nExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF11965F219593280BA42 /* L10nExtension.swift */; };
 		520FF84CF89D0A0C1B5D8F19 /* FocusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFF1C539334046C290FB /* FocusableView.swift */; };
 		520FF8510B3CAD185D2579C3 /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFF6E97F17AFD0D0A3DE7 /* VideoViewController.swift */; };
+		520FF8D4DC96B9EF79F02E5F /* ListViewSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4C7CAA7FA02E9769173 /* ListViewSelection.swift */; };
 		520FF9B4F1E02732E9EDAF6F /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF6427EC66C5B6082B492 /* NavigationController.swift */; };
 		520FFA746F11A2758F17B9A5 /* PosterItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAF8AC6A1DEEDF17E5B5 /* PosterItemCell.swift */; };
 		520FFAA589A412D5AF2378EB /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF3265086C75022768569 /* ChatView.swift */; };
@@ -41,6 +43,7 @@
 		520FFB825E93A80CB495CE94 /* TwitchBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF161DD28A1138F5C6379 /* TwitchBadge.swift */; };
 		520FFBADF52B23EFE82BBBF4 /* TwitchCommunity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF451309219761ACFBC10 /* TwitchCommunity.swift */; };
 		520FFBE5CF88BCDD5AA5447D /* PosterItemsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF8073DF62DEA67B625BB /* PosterItemsListViewController.swift */; };
+		520FFC1A920AF4B8AA2D6D0E /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4D527A237F8F9161832 /* SettingsViewController.swift */; };
 		520FFCAA1F4A6DECF3D2FCD2 /* VideoOnDemandCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFA0F9BF6978B0A704F2B /* VideoOnDemandCell.swift */; };
 		520FFD963963F3854FBDE634 /* TwitchedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF74D46312D89C92150AD /* TwitchedTests.swift */; };
 		520FFE07910F39C07782AF92 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAFF6F583221F4F7B6BC /* Constants.swift */; };
@@ -59,6 +62,7 @@
 		A95B030420A81CBE004B39C2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A95B030220A81CBE004B39C2 /* Localizable.strings */; };
 		A98C939720EB927B009DB42D /* SocketSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A98C939620EB927B009DB42D /* SocketSwift.framework */; };
 		A99B7BF1209ACB2E00229725 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99B7BF0209ACB2E00229725 /* Alamofire.framework */; };
+		A9B6EE382112580C00A98694 /* twitch_lang.json in Resources */ = {isa = PBXBuildFile; fileRef = A9B6EE372112580B00A98694 /* twitch_lang.json */; };
 		A9D9BFCB209BA0A600D9DDEA /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D9BFCA209BA0A600D9DDEA /* VideoCell.swift */; };
 		A9EE5B1A20A0160800DA5F5E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9EE5B1920A0160800DA5F5E /* QuartzCore.framework */; };
 		A9FCC97C20A032D700853DD3 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FCC97B20A032D700853DD3 /* MarqueeLabel.swift */; };
@@ -96,6 +100,8 @@
 		520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchedLinkId.swift; path = Twitched/data/json/TwitchedLinkId.swift; sourceTree = SOURCE_ROOT; };
 		520FF4B0596F638301A02309 /* TwitchedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchedUITests.swift; sourceTree = "<group>"; };
 		520FF4B38C26C2F224FDA220 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		520FF4C7CAA7FA02E9769173 /* ListViewSelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ListViewSelection.swift; path = Twitched/data/model/ListViewSelection.swift; sourceTree = SOURCE_ROOT; };
+		520FF4D527A237F8F9161832 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		520FF4D74DBC1F8E242C047B /* TwitchTokenValidation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchTokenValidation.swift; path = Twitched/data/json/TwitchTokenValidation.swift; sourceTree = SOURCE_ROOT; };
 		520FF594D5D6D23B7F1E7AA2 /* TwitchUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchUser.swift; path = Twitched/data/json/TwitchUser.swift; sourceTree = SOURCE_ROOT; };
 		520FF61B88ABA333CDDCCF0F /* TwitchedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwitchedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,6 +122,7 @@
 		520FF9FE6BDD847F2F44457D /* IrcClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IrcClient.swift; sourceTree = "<group>"; };
 		520FFA0F9BF6978B0A704F2B /* VideoOnDemandCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoOnDemandCell.swift; sourceTree = "<group>"; };
 		520FFA67BC34B13DDDB537C9 /* VideoCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCollectionCell.swift; sourceTree = "<group>"; };
+		520FFAAAAE59D39E51C9C6DB /* MultipleChoiceListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipleChoiceListViewController.swift; sourceTree = "<group>"; };
 		520FFAEA2D592121AE726287 /* PosterItemCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PosterItemCollectionCell.swift; sourceTree = "<group>"; };
 		520FFAF8AC6A1DEEDF17E5B5 /* PosterItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PosterItemCell.swift; sourceTree = "<group>"; };
 		520FFAFF6F583221F4F7B6BC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -147,6 +154,7 @@
 		A98C939420EB9262009DB42D /* SocketSwift.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SocketSwift.framework.dSYM; path = Carthage/Build/tvOS/SocketSwift.framework.dSYM; sourceTree = "<group>"; };
 		A98C939620EB927B009DB42D /* SocketSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketSwift.framework; path = Carthage/Build/tvOS/SocketSwift.framework; sourceTree = "<group>"; };
 		A99B7BF0209ACB2E00229725 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/tvOS/Alamofire.framework; sourceTree = "<group>"; };
+		A9B6EE372112580B00A98694 /* twitch_lang.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = twitch_lang.json; sourceTree = "<group>"; };
 		A9D9BFCA209BA0A600D9DDEA /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		A9EE5B1920A0160800DA5F5E /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A9EE5B1B20A01D4100DA5F5E /* MarqueeLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MarqueeLabel.framework; path = Carthage/Build/tvOS/MarqueeLabel.framework; sourceTree = "<group>"; };
@@ -227,6 +235,15 @@
 			path = json;
 			sourceTree = "<group>";
 		};
+		520FF9001A09743363801D58 /* input */ = {
+			isa = PBXGroup;
+			children = (
+				520FFAAAAE59D39E51C9C6DB /* MultipleChoiceListViewController.swift */,
+				520FF4C7CAA7FA02E9769173 /* ListViewSelection.swift */,
+			);
+			path = input;
+			sourceTree = "<group>";
+		};
 		520FFAA029DD5E5D36AB865B /* Twitched */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,6 +300,7 @@
 		520FFD5ABBAE903F9CBAD3FE = {
 			isa = PBXGroup;
 			children = (
+				A9B6EE372112580B00A98694 /* twitch_lang.json */,
 				A932CDAF209787CF003285C4 /* third_party.txt */,
 				520FFAC629F3A29FA2EEEBF0 /* Products */,
 				520FFAA029DD5E5D36AB865B /* Twitched */,
@@ -312,6 +330,8 @@
 				520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */,
 				520FFF6E97F17AFD0D0A3DE7 /* VideoViewController.swift */,
 				520FFF42E82888CE5453919C /* LoginViewController.swift */,
+				520FF4D527A237F8F9161832 /* SettingsViewController.swift */,
+				520FF9001A09743363801D58 /* input */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -499,6 +519,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9B6EE382112580C00A98694 /* twitch_lang.json in Resources */,
 				A95B02FA20A818F3004B39C2 /* Main.storyboard in Resources */,
 				A95B030420A81CBE004B39C2 /* Localizable.strings in Resources */,
 				520FFB1BEFF8EAA4824BC42C /* Assets.xcassets in Resources */,
@@ -614,6 +635,9 @@
 				520FF72848185E25550DD4A0 /* Emote.swift in Sources */,
 				520FFB3D7B66614D585B687A /* TwitchBadgeSet.swift in Sources */,
 				520FFB825E93A80CB495CE94 /* TwitchBadge.swift in Sources */,
+				520FFC1A920AF4B8AA2D6D0E /* SettingsViewController.swift in Sources */,
+				520FF6F4973900423DE53D85 /* MultipleChoiceListViewController.swift in Sources */,
+				520FF8D4DC96B9EF79F02E5F /* ListViewSelection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,6 +18,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     @IBOutlet private weak var collectionView: UICollectionView?
     @IBOutlet private weak var messageLabel: UILabel?
     @IBOutlet private weak var loadingIndicator: UIActivityIndicatorView?
+    @IBOutlet private weak var followedLoginMessageView: UIView?
     private var lastUpdateTime: TimeInterval?
     private var streams: Array<TwitchStream>?
     private var page: Int?
@@ -49,9 +50,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     private var shouldUpdate: Bool {
         get {
             return (lastUpdateTime != nil && Date().timeIntervalSince1970 - lastUpdateTime! >= UPDATE_INTERVAL) ||
-                    VideoGridViewController.needsFollowsUpdate
+                    (VideoGridViewController.needsFollowsUpdate && self.loadFollowedStreams) ||
+                    (VideoGridViewController.needsPopularUpdate && !self.loadFollowedStreams)
         }
     }
+    static var needsPopularUpdate: Bool = false
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
@@ -79,6 +82,26 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                 at: IndexPath(item: 0, section: 0)) {
             self.initialHeaderBounds = header.bounds
         }
+        updateLoginState()
+    }
+
+    /// Determine if login message should be shown
+    private func updateLoginState() {
+        if let followedLoginMessageView = self.followedLoginMessageView {
+            followedLoginMessageView.alpha = 0
+            followedLoginMessageView.isUserInteractionEnabled = false
+            if self.loadFollowedStreams {
+                TwitchApi.afterLogin(callback: { isLoggedIn in
+                    if !isLoggedIn {
+                        DispatchQueue.main.async(execute: {
+                            followedLoginMessageView.alpha = 1
+                            followedLoginMessageView.isUserInteractionEnabled = true
+                            self.view.bringSubview(toFront: followedLoginMessageView)
+                        })
+                    }
+                })
+            }
+        }
     }
 
     /// Disappeared
@@ -98,6 +121,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         page = 0
         isLoading = false
         VideoGridViewController.needsFollowsUpdate = false
+        VideoGridViewController.needsPopularUpdate = false
         populateCollectionView()
     }
 
@@ -133,7 +157,9 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         }
         let handleStreamData: (Array<TwitchStream>?) -> Void = { response in
             if let streams: Array<TwitchStream> = response {
-                self.lastUpdateTime = Date().timeIntervalSince1970
+                if streams.count > 0 {
+                    self.lastUpdateTime = Date().timeIntervalSince1970
+                }
                 if (!append!) || self.streams == nil {
                     self.streams = streams
                     self.collectionView?.reloadData()
@@ -256,7 +282,9 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                     self.populateCollectionViewWithReset()
                 }
             }
-            self.present(streamInfoViewController, animated: true)
+            DispatchQueue.main.async(execute: {
+                self.present(streamInfoViewController, animated: true)
+            })
         }
     }
 
@@ -414,7 +442,12 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                             withIdentifier: "loginViewController") as! LoginViewController
                     loginViewController.modalPresentationStyle = .blurOverFullScreen
                     loginViewController.modalTransitionStyle = .crossDissolve
-                    self.present(loginViewController, animated: true)
+                    loginViewController.dismissCallback = {
+                        self.populateCollectionViewWithReset()
+                    }
+                    DispatchQueue.main.async(execute: {
+                        self.present(loginViewController, animated: true)
+                    })
                 }
             })
         }
@@ -528,5 +561,23 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         if let loadFollowedStreams = coder.decodeObject(forKey: "loadFollowedStreams") as? Bool {
             self.loadFollowedStreams = loadFollowedStreams
         }
+    }
+    
+    /// Handle accout link button pressed
+    @IBAction
+    private func handleAccountLinkButton() {
+        let loginViewController: LoginViewController = self.storyboard?.instantiateViewController(
+                withIdentifier: "loginViewController") as! LoginViewController
+        loginViewController.modalPresentationStyle = .blurOverFullScreen
+        loginViewController.modalTransitionStyle = .crossDissolve
+        loginViewController.dismissCallback = {
+            DispatchQueue.main.async(execute: {
+                self.updateLoginState()
+                self.populateCollectionViewWithReset()
+            })
+        }
+        DispatchQueue.main.async(execute: {
+            self.present(loginViewController, animated: true)
+        })
     }
 }

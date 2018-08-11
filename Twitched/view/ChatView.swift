@@ -9,6 +9,9 @@ import os.log
 class ChatView: UIView {
     private var irc: IrcClient?
     private var chatMessages: Array<UILabel> = Array()
+    private let addQueue: DispatchQueue = DispatchQueue(label: "org.twitched.twitched.chatview.addmessage",
+            attributes: .concurrent)
+    private var test: Int = 0
 
     /// Init
     override func awakeFromNib() {
@@ -105,7 +108,7 @@ class ChatView: UIView {
                         // Append pre
                         let start = message.message.index(message.message.startIndex, offsetBy: lastPos)
                         let end = message.message.index(message.message.startIndex, offsetBy: emote.start)
-                        lastPos = emote.end
+                        lastPos = emote.end + 1
                         attributedMessage.append(NSAttributedString(string: "\t" +
                                 String(message.message[start..<end])))
                         if let emoteImage = images[emote.url] {
@@ -117,10 +120,24 @@ class ChatView: UIView {
                             attributedMessage.append(NSAttributedString(attachment: emoteAttachment))
                         }
                     }
+                    // Append post
+                    if lastPos <= message.message.count {
+                        let start = message.message.index(message.message.startIndex, offsetBy: lastPos)
+                        attributedMessage.append(NSAttributedString(string: String(message.message.suffix(from: start))))
+                    }
                 }
+                label.isHidden = false
+                label.isEnabled = true
+                label.isOpaque = true
                 label.attributedText = attributedMessage
-                label.sizeToFit()
-                self.addMessage(label: label)
+                if Thread.isMainThread {
+                    self.addMessage(label: label)
+                }
+                else {
+                    DispatchQueue.main.sync(execute: {
+                        self.addMessage(label: label)
+                    })
+                }
             })
         }
     }
@@ -149,6 +166,7 @@ class ChatView: UIView {
 
     /// Add a label to the chat
     private func addMessage(label: UILabel) {
+        label.sizeToFit()
         // Position after last message
         if let lastMessage = self.chatMessages.last {
             label.frame = CGRect(
@@ -200,7 +218,13 @@ extension UIView {
     /// Wait for the user interface style to be populated
     func onUserInterfaceStyle(completion: @escaping (UIUserInterfaceStyle) -> Void) {
         DispatchQueue.global(qos: .background).async {
-            while self.traitCollection.userInterfaceStyle == UIUserInterfaceStyle.unspecified {}
+            var waiting = true
+            while waiting {
+                DispatchQueue.main.async {
+                    waiting = self.traitCollection.userInterfaceStyle == .unspecified
+                }
+                sleep(1)
+            }
             DispatchQueue.main.async {
                 completion(self.traitCollection.userInterfaceStyle)
             }

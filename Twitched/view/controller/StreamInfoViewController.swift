@@ -138,7 +138,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                     message: user.description,
                     preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: nil, style: .cancel))
-            self.present(alert, animated: true)
+            DispatchQueue.main.async(execute: {
+                self.present(alert, animated: true)
+            })
         }
     }
 
@@ -181,7 +183,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
             }
             videoViewController.modalPresentationStyle = .blurOverFullScreen
             videoViewController.modalTransitionStyle = .crossDissolve
-            self.present(videoViewController, animated: true)
+            DispatchQueue.main.async(execute: {
+                self.present(videoViewController, animated: true)
+            })
         }
     }
 
@@ -392,7 +396,9 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
             videoGridViewController.headerTitle = gameName
             videoGridViewController.modalPresentationStyle = .blurOverFullScreen
             videoGridViewController.modalTransitionStyle = .crossDissolve
-            self.present(videoGridViewController, animated: true)
+            DispatchQueue.main.async(execute: {
+                self.present(videoGridViewController, animated: true)
+            })
         }
     }
     
@@ -427,7 +433,12 @@ class StreamInfoViewController: UIViewController, UIScrollViewDelegate, UITableV
                             withIdentifier: "loginViewController") as! LoginViewController
                     loginViewController.modalPresentationStyle = .blurOverFullScreen
                     loginViewController.modalTransitionStyle = .crossDissolve
-                    self.present(loginViewController, animated: true)
+                    loginViewController.dismissCallback = {
+                        self.loadUserInfo()
+                    }
+                    DispatchQueue.main.async(execute: {
+                        self.present(loginViewController, animated: true)
+                    })
                 }
             })
         }

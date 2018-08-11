@@ -14,6 +14,7 @@ class LoginViewController: UIViewController {
 
     private var isRequestingStatus: Bool?
     private var statusTimer: Timer?
+    public var dismissCallback: (() -> Void)?
 
     /// View loaded
     override func viewDidLoad() {
@@ -97,11 +98,15 @@ class LoginViewController: UIViewController {
             case .SUCCESS:
                 title = "title.link_success".l10n()
                 message = "message.link_complete".l10n()
+                VideoGridViewController.needsFollowsUpdate = true
+                PosterItemsListViewController.needsGameUpdate = true
+                PosterItemsListViewController.needsCommunityUpdate = true
         }
         let alert = UIAlertController(title: title, message: message,
                 preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "button.confirm".l10n(),
                 style: .cancel, handler: { _ in
+            TwitchApi.tryTimeLogIn()
             self.dismiss(animated: true)
         }))
         self.present(alert, animated: true)
@@ -114,7 +119,14 @@ class LoginViewController: UIViewController {
 
     // Handle dismissal
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
-        super.dismiss(animated: flag, completion: completion)
+        super.dismiss(animated: flag, completion: {
+            if let completion = completion {
+                completion()
+            }
+            if let dismissCallback = self.dismissCallback {
+                dismissCallback()
+            }
+        })
         if let timer = statusTimer {
             if timer.isValid {
                 timer.invalidate()

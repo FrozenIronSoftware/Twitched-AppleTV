@@ -42,12 +42,25 @@
 "title.communities" = "Communities";
 "title.followed_communities" = "Followed Communities";
 "title.offline" = "Offline";
+"title.twitched" = "Twitched";
+"title.language" = "Language";
+"title.stream_quality" = "Stream Quality";
+"title.stream_language" = "Stream Language";
+"title.quality" = "Quality";
+"title.log_in" = "Log In";
+"title.log_out" = "Log Out";
+"title.about" = "About";
+"title.automatic" = "Automatic";
+"title.multiple" = "Multiple";
+"title.all" = "All";
 
 /* Message
    Items in this group should be full sentences or paragraphs. */
 
 "message.stream_offline" = "This stream is offline.";
 "message.no_description" = "No description provided.";
+"message.irc_disconnected" = "Disconnected from chat";
+"message.irc_connected" = "Connected to chat";
 
 /* Message Error
    Items in this group should follow the message requirements, but must expect an integer formatting error code. */

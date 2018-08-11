@@ -107,14 +107,14 @@ class IrcClient {
                         self.channel = ircMessage.params[safe: 0]
                         NotificationCenter.default.post(name: .IrcChatMessage, object: self,
                                 userInfo: ["message":
-                                    ChatMessage(name: "twitched".l10n(), message: "message_irc_connected".l10n(),
+                                    ChatMessage(name: "title.twitched".l10n(), message: "message.irc_connected".l10n(),
                                             color: "#ffffff")
                                 ])
                     }
                     else if ircMessage.command == Command.PART {
                         NotificationCenter.default.post(name: .IrcChatMessage, object: self,
                                 userInfo: ["message":
-                                ChatMessage(name: "twitched".l10n(), message: "message_irc_disconnected".l10n(),
+                                ChatMessage(name: "title.twitched".l10n(), message: "message.irc_disconnected".l10n(),
                                         color: "#ffffff")
                                 ])
                     }

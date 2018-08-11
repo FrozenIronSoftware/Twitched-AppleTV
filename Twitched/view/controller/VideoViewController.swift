@@ -72,6 +72,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
             switch idType {
                 case .STREAM:
                     TwitchApi.getStreams(parameters: [
+                        "limit": 1,
                         "user_id": id
                     ], callback: { response in
                         if let streams: Array<TwitchStream> = response {
@@ -127,13 +128,15 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
                 style: .cancel, handler: { _ in
             self.dismiss(animated: true)
         }))
-        self.present(alert, animated: true)
+        DispatchQueue.main.async(execute: {
+            self.present(alert, animated: true)
+        })
     }
 
     /// Fetch the thumbnal and play the video
     private func fetchThumbnailThenPlayVideo(_ url: String) {
         if let thumbnailUrl: String = self.thumbnailUrl {
-            ImageUtil.imageFromUrl(url: thumbnailUrl, completion: { response in
+            let _ = ImageUtil.imageFromUrl(url: thumbnailUrl, completion: { response in
                 if let image: UIImage = response {
                     self.thumbnail = image
                 }
