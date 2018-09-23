@@ -35,12 +35,14 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
                     (PosterItemsListViewController.needsCommunityUpdate && loadCommunityData)
         }
     }
+    var loadFollowed: Bool = true
+    var noHeader: Bool = false
 
     /// View loaded
     override func viewDidLoad() {
         super.viewDidLoad()
         os_log("GameList did load: Community data: %@", type: .debug, loadCommunityData.description)
-        reset()
+        loadAllItemsWithReset()
     }
 
     /// Reset the state to page zero and load followed games
@@ -57,6 +59,11 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         else if PosterItemsListViewController.needsCommunityUpdate && self.loadCommunityData {
             PosterItemsListViewController.needsCommunityUpdate = false
         }
+    }
+    
+    /// Reset the view and load all items
+    private func loadAllItemsWithReset() {
+        reset()
         loadTopItems(completion: {
             self.loadFollowedItems(completion: {
                 if self.topItems.count > 0 {
@@ -74,7 +81,7 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if self.shouldReload {
-            reset()
+            loadAllItemsWithReset()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
                 name: .UIApplicationDidBecomeActive, object: nil)
@@ -87,7 +94,8 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
     }
 
     /// Load top games
-    private func loadTopItems(append: Bool = false, completion: @escaping (() -> Void) = {}) {
+    private func loadTopItems(append: Bool = false, completion: @escaping (() -> Void) = {},
+                              searchQuery: String? = nil) {
         if self.topItemsPage < self.MAX_PAGES && !self.topItemsLoading {
             self.topItemsLoading = true
             let onTopItemData: (Array<Any>?) -> Void = { response in
@@ -106,7 +114,16 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
                 self.topItemsLoading = false
                 completion()
             }
-            if self.loadCommunityData {
+            if searchQuery != nil && !(searchQuery?.isEmpty)! {
+                if let searchQuery = searchQuery {
+                    TwitchApi.search(parameters: [
+                        "limit": self.PAGE_LIMIT,
+                        "offset": self.topItemsPage,
+                        "query": searchQuery
+                    ], callbackGame: onTopItemData, games: true)
+                }
+            }
+            else if self.loadCommunityData {
                 TwitchApi.getTopCommunities(parameters: [
                     "limit": self.PAGE_LIMIT,
                     "offset": self.topItemsPage
@@ -126,6 +143,10 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
 
     /// Load followed games
     private func loadFollowedItems(append: Bool = false, completion: @escaping (() -> Void) = {}) {
+        if !self.loadFollowed {
+            completion()
+            return
+        }
         TwitchApi.afterLogin(callback: { isLoggedIn in
             if isLoggedIn && self.followedItemsPage < self.MAX_PAGES && !self.followedItemsLoading {
                 self.followedItemsLoading = true
@@ -161,6 +182,22 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         })
     }
 
+    /// Search for games
+    func search(_ query: String) {
+        reset()
+        loadTopItems(completion: {
+            self.loadFollowedItems(completion: {
+                if self.topItems.count > 0 {
+                    self.lastUpdateTime = Date().timeIntervalSince1970
+                }
+                DispatchQueue.main.async(execute: {
+                    self.tableView?.reloadData()
+                    self.loadingIndicator?.stopAnimating()
+                })
+            })
+        }, searchQuery: query)
+    }
+
     /// Set table view rows
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var rows: Int = 0
@@ -178,7 +215,10 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         let cell: PosterItemCollectionCell = tableView.dequeueReusableCell(withIdentifier: "gameCollectionCell",
                 for: indexPath) as! PosterItemCollectionCell
         if indexPath.item == 0 && self.topItems.count > 0 {
-            if !self.loadCommunityData {
+            if self.noHeader {
+                cell.headerTitle = ""
+            }
+            else if !self.loadCommunityData {
                 cell.headerTitle = "title.games".l10n()
             }
             else {
@@ -187,7 +227,10 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
             cell.items = self.topItems
         }
         else if self.followedItems.count > 0 {
-            if !self.loadCommunityData {
+            if self.noHeader {
+                cell.headerTitle = ""
+            }
+            else if !self.loadCommunityData {
                 cell.headerTitle = "title.followed_games".l10n()
             }
             else {
@@ -268,7 +311,7 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         videoGridViewController.modalTransitionStyle = .crossDissolve
         videoGridViewController.dismissCompletion = {
             if self.shouldReload {
-                self.reset()
+                self.loadAllItemsWithReset()
             }
         }
         self.present(videoGridViewController, animated: true)
@@ -279,7 +322,7 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
         os_log("GameListViewController active: Community data: %@", type: .debug, loadCommunityData.description)
         // Update the items if needed
         if shouldReload {
-            reset()
+            loadAllItemsWithReset()
         }
     }
 

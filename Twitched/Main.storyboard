@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="14113" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="14313.18" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="appleTV" orientation="landscape">
         <adaptation id="light"/>
     </device>
     <dependencies>
         <deployment identifier="tvOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -347,6 +347,7 @@
                         <segue destination="8rJ-Kc-sve" kind="relationship" relationship="viewControllers" id="lzU-1b-eKA"/>
                         <segue destination="GV7-C5-SPg" kind="relationship" relationship="viewControllers" id="lNE-Xc-III"/>
                         <segue destination="MOb-mC-ggm" kind="relationship" relationship="viewControllers" id="Kd3-Z0-0ry"/>
+                        <segue destination="tGG-as-IQB" kind="relationship" relationship="viewControllers" id="oWj-hj-pVz"/>
                         <segue destination="E8R-0t-KWr" kind="relationship" relationship="viewControllers" id="aeG-Uz-4zC"/>
                     </connections>
                 </tabBarController>
@@ -1353,6 +1354,42 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bmV-UO-brv" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+        <!--Search View Controller-->
+        <scene sceneID="dJm-KU-fgN">
+            <objects>
+                <viewController storyboardIdentifier="searchViewController" title="Search View Controller" useStoryboardIdentifierAsRestorationIdentifier="YES" id="tGG-as-IQB" customClass="SearchViewController" customModule="Twitched" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Ec4-04-2un"/>
+                        <viewControllerLayoutGuide type="bottom" id="8WB-VX-Cbb"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" restorationIdentifier="view" id="JrK-7e-5AM">
+                        <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="segmentControl" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="CgK-2V-yZA" userLabel="searchType">
+                                <rect key="frame" x="705" y="506" width="510" height="70"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.10000000000000001" colorSpace="calibratedWhite"/>
+                                <segments>
+                                    <segment title="Streams"/>
+                                    <segment title="Channels"/>
+                                    <segment title="Games"/>
+                                </segments>
+                                <connections>
+                                    <action selector="segmentedControlValueChanged:" destination="tGG-as-IQB" eventType="valueChanged" id="zWy-qI-W5p"/>
+                                </connections>
+                            </segmentedControl>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="G5m-r6-yyb"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Search" id="jGd-sf-PFB"/>
+                    <connections>
+                        <outlet property="searchType" destination="CgK-2V-yZA" id="7zO-dY-dOX"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sAe-Rl-lM4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
     </scenes>

@@ -45,6 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    /// Determine if the application state should be saved
     func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"]!
         let build = Bundle.main.infoDictionary!["CFBundleVersion"]!
@@ -53,6 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    /// Determine if the application state should be restored
     func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
         let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"]! as! String
         let build = Bundle.main.infoDictionary!["CFBundleVersion"]! as! String

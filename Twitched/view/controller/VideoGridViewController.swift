@@ -11,7 +11,8 @@ import Alamofire
 import os.log
 import L10n_swift
 
-class VideoGridViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class VideoGridViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate,
+    UICollectionViewDelegateFlowLayout {
 
     private let UPDATE_INTERVAL: TimeInterval = 60 * 10
     private let MAX_PAGE: Int = 10
@@ -55,17 +56,50 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         }
     }
     static var needsPopularUpdate: Bool = false
+    private var startEmpty: Bool = false
+    var noHeader: Bool = false
+    private var query: String?
+    private var searchChannels: Bool = false
+
+    /// Initialize
+    /// @param startEmpty bool should the grid not initialize
+    init(startEmpty empty: Bool = false) {
+        super.init(nibName: nil, bundle: nil)
+        self.startEmpty = empty
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
 
     /// View is about to appear
     /// Check if enough time has passed that the grid needs an update
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         os_log("VideoGridView will appear", type: .debug)
-        if self.shouldUpdate {
+        if self.shouldUpdate && !self.startEmpty {
             populateCollectionViewWithReset()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
                 name: .UIApplicationDidBecomeActive, object: nil)
+    }
+
+    /// Poll the API for search results, then populate the grid
+    func search(_ query: String, channels: Bool = false) {
+        if query.isEmpty {
+            if !startEmpty {
+                populateCollectionViewWithReset()
+            }
+            else {
+                resetCollectionView(resetSearch: true)
+            }
+        }
+        else {
+            resetCollectionView()
+            self.query = query
+            self.searchChannels = channels
+            populateCollectionView(offset: page, append: false)
+        }
     }
 
     /// Disappear
@@ -118,11 +152,20 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
 
     /// Reset the view and populate the view
     private func populateCollectionViewWithReset() {
+        resetCollectionView()
+        populateCollectionView()
+    }
+
+    /// Reset the collection view
+    private func resetCollectionView(resetSearch: Bool = false) {
         page = 0
         isLoading = false
         VideoGridViewController.needsFollowsUpdate = false
         VideoGridViewController.needsPopularUpdate = false
-        populateCollectionView()
+        if resetSearch {
+            query = nil
+            searchChannels = false
+        }
     }
 
     /// Handle the view loading
@@ -130,7 +173,9 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     override func viewDidLoad() {
         super.viewDidLoad()
         os_log("VideoGridView loaded", type: .debug)
-        populateCollectionViewWithReset()
+        if !startEmpty {
+            populateCollectionViewWithReset()
+        }
     }
 
     /// Retrieves stream data from the API and populates the collection view
@@ -191,7 +236,14 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             self.loadingIndicator?.stopAnimating()
             self.isLoading = false
         }
-        if loadFollowedStreams {
+        if query != nil && !(query?.isEmpty)! {
+            params["query"] = query
+            if searchChannels {
+                params["type"] = "channels"
+            }
+            TwitchApi.search(parameters: params, callback: handleStreamData)
+        }
+        else if loadFollowedStreams {
             TwitchApi.afterLogin(callback: { isLoggedIn in
                 if isLoggedIn {
                     TwitchApi.getFollowedStreams(parameters: params, callback: handleStreamData)
@@ -344,12 +396,35 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         return true
     }
 
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
+                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+        if self.noHeader {
+            return .zero
+        }
+        return CGSize(width: 1740, height: 135) // Hardcoded header size
+    }
+
     /// Populate the header
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
         let header: TextHeader = collectionView.dequeueReusableSupplementaryView(
                 ofKind: UICollectionElementKindSectionHeader,
                 withReuseIdentifier: "header", for: indexPath) as! TextHeader
+        if self.noHeader {
+            // Set the collection view frame
+            if let collectionView = self.collectionView {
+                collectionView.frame = CGRect(x: collectionView.frame.minX, y: 0,
+                        width: collectionView.frame.width,
+                        height: collectionView.frame.height + collectionView.frame.minY)
+            }
+            // Zero header
+            header.frame = .zero
+            header.frame.size.width = 0
+            header.frame.size.height = 0
+            header.bounds = .zero
+            header.isHidden = true
+            return header
+        }
         if self.loadFollowedStreams && indexPath.section == 1 {
             header.textLabel?.text = "title.offline".l10n()
         }
@@ -520,9 +595,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             populateCollectionViewWithReset()
         }
         // Focus the active cell
-        for cell in (collectionView?.visibleCells)! {
-            let cell: VideoCell = cell as! VideoCell
-            cell.setFocused(cell.isFocused)
+        if let collectionView = collectionView {
+            for cell in collectionView.visibleCells {
+                let cell: VideoCell = cell as! VideoCell
+                cell.setFocused(cell.isFocused)
+            }
         }
     }
 
@@ -544,6 +621,11 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         coder.encode(communityId, forKey: "communityId")
         coder.encode(headerTitle, forKey: "headerTitle")
         coder.encode(loadFollowedStreams, forKey: "loadFollowedStreams")
+        coder.encode(isFollowing, forKey: "isFollowing")
+        coder.encode(startEmpty, forKey: "startEmpty")
+        coder.encode(noHeader, forKey: "noHeader")
+        coder.encode(query, forKey: "query")
+        coder.encode(searchChannels, forKey: "searchChannels")
     }
 
     /// Decode
@@ -560,6 +642,21 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         }
         if let loadFollowedStreams = coder.decodeObject(forKey: "loadFollowedStreams") as? Bool {
             self.loadFollowedStreams = loadFollowedStreams
+        }
+        if let startEmpty = coder.decodeObject(forKey: "startEmpty") as? Bool {
+            self.startEmpty = startEmpty
+        }
+        if let noHeader = coder.decodeObject(forKey: "noHeader") as? Bool {
+            self.noHeader = noHeader
+        }
+        if let query = coder.decodeObject(forKey: "query") as? String {
+            self.query = query
+        }
+        if let searchChannels = coder.decodeObject(forKey: "searchChannels") as? Bool {
+            self.searchChannels = searchChannels
+        }
+        if let isFollowing = coder.decodeObject(forKey: "isFollowing") as? Bool {
+            self.isFollowing = isFollowing
         }
     }
     

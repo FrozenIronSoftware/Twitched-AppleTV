@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		520FF0368C4C7DC15EA82B1F /* TwitchAccessToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF08CAA6201072A651031 /* TwitchAccessToken.swift */; };
+		520FF07F21D8166393D926FC /* AnyEncodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFB5F86A44FF1A21397DF /* AnyEncodable.swift */; };
 		520FF0ADB59D9128EA532B7A /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF6AF52480843E63008DD /* ChatMessage.swift */; };
 		520FF0EF1F1804D8577B0E05 /* TwitchGameFollowStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF863F95BC41252C56E2F /* TwitchGameFollowStatus.swift */; };
 		520FF1435744EA8711C34976 /* StreamInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF064E8CE0B5D6ACC449F /* StreamInfoViewController.swift */; };
@@ -20,10 +21,12 @@
 		520FF2801F8F42B905A0FADF /* TwitchTokenValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4D74DBC1F8E242C047B /* TwitchTokenValidation.swift */; };
 		520FF4A9A88145C0E4CEBBD4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4B38C26C2F224FDA220 /* AppDelegate.swift */; };
 		520FF4D765A5FD4E85DA597C /* FocusableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF6AC6E4563CE16B9D11D /* FocusableTextView.swift */; };
+		520FF5B6E5841161342AC1E6 /* AnyCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFC9E9A922E012A23E3C5 /* AnyCodable.swift */; };
 		520FF616848AC65FDB57CAFC /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFF42E82888CE5453919C /* LoginViewController.swift */; };
 		520FF63D597400138B8B6944 /* PosterItemCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAEA2D592121AE726287 /* PosterItemCollectionCell.swift */; };
 		520FF66FB9429995890AF38D /* TwitchUserFollow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF7231B6664B0908FACEC /* TwitchUserFollow.swift */; };
 		520FF68F75C2016EF610F9D9 /* TwitchStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */; };
+		520FF699C7A619827CFDCC7D /* AnyDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFCC0FED7B1865338FF72 /* AnyDecodable.swift */; };
 		520FF6F4973900423DE53D85 /* MultipleChoiceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAAAAE59D39E51C9C6DB /* MultipleChoiceListViewController.swift */; };
 		520FF6F7669C555E8D2A63BE /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF862DBB6424CEE37E5CE /* TwitchApi.swift */; };
 		520FF6FEB48F6D5C1614B832 /* OnlineOfflineCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4221C649433FFD75EAE /* OnlineOfflineCount.swift */; };
@@ -48,11 +51,13 @@
 		520FFD963963F3854FBDE634 /* TwitchedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF74D46312D89C92150AD /* TwitchedTests.swift */; };
 		520FFE07910F39C07782AF92 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFAFF6F583221F4F7B6BC /* Constants.swift */; };
 		520FFE1856A1A737045D0D4E /* TwitchedLinkId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */; };
+		520FFEDD4EDA47203F26DAC1 /* SearchViewControllerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFC803798B4FCE8841C23 /* SearchViewControllerHandler.swift */; };
 		520FFF0C7D6CD13907C2603B /* IrcMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFDC2DC014FC100C9987F /* IrcMessage.swift */; };
 		520FFF9878F53EB575B14874 /* TwitchGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF9533175CC293F41A2AA /* TwitchGame.swift */; };
 		520FFFAA22B687D4D0E8215C /* ImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF98C71FABF603A7C49B4 /* ImageUtil.swift */; };
 		520FFFC145B25490C2BC3766 /* VideoGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */; };
 		520FFFD82B4BA7366F07CF4B /* TextHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFFABDA6637BE47A08451 /* TextHeader.swift */; };
+		520FFFFEBBEBB8DFA07477AA /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF0CF781D0CC8DB554293 /* SearchViewController.swift */; };
 		A9179B112103A14E00FDA6B8 /* Regex.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9179B102103A14E00FDA6B8 /* Regex.framework */; };
 		A9179B1621051E8C00FDA6B8 /* TwitchBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9179B1521051E8C00FDA6B8 /* TwitchBadges.swift */; };
 		A9179B182109013F00FDA6B8 /* AlamofireImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9179B172109013F00FDA6B8 /* AlamofireImage.framework */; };
@@ -90,6 +95,7 @@
 		520FF00C5340DB45A591C7E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		520FF064E8CE0B5D6ACC449F /* StreamInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamInfoViewController.swift; sourceTree = "<group>"; };
 		520FF08CAA6201072A651031 /* TwitchAccessToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchAccessToken.swift; path = Twitched/data/json/TwitchAccessToken.swift; sourceTree = SOURCE_ROOT; };
+		520FF0CF781D0CC8DB554293 /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		520FF11965F219593280BA42 /* L10nExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = L10nExtension.swift; sourceTree = "<group>"; };
 		520FF161DD28A1138F5C6379 /* TwitchBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchBadge.swift; sourceTree = "<group>"; };
 		520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchStream.swift; sourceTree = "<group>"; };
@@ -126,8 +132,12 @@
 		520FFAEA2D592121AE726287 /* PosterItemCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PosterItemCollectionCell.swift; sourceTree = "<group>"; };
 		520FFAF8AC6A1DEEDF17E5B5 /* PosterItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PosterItemCell.swift; sourceTree = "<group>"; };
 		520FFAFF6F583221F4F7B6BC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		520FFB5F86A44FF1A21397DF /* AnyEncodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyEncodable.swift; sourceTree = "<group>"; };
 		520FFB683CD3F010074A61C2 /* CallbackActionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackActionHandler.swift; sourceTree = "<group>"; };
 		520FFC53227222F172382263 /* FocusGuideRepresentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusGuideRepresentation.swift; sourceTree = "<group>"; };
+		520FFC803798B4FCE8841C23 /* SearchViewControllerHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewControllerHandler.swift; sourceTree = "<group>"; };
+		520FFC9E9A922E012A23E3C5 /* AnyCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyCodable.swift; sourceTree = "<group>"; };
+		520FFCC0FED7B1865338FF72 /* AnyDecodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyDecodable.swift; sourceTree = "<group>"; };
 		520FFCDCD64C8E7971565151 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		520FFCE16B63E5F5BBB2B26F /* TwitchBadgeSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchBadgeSet.swift; sourceTree = "<group>"; };
 		520FFD6A32A7BCF45D418E01 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -332,6 +342,8 @@
 				520FFF42E82888CE5453919C /* LoginViewController.swift */,
 				520FF4D527A237F8F9161832 /* SettingsViewController.swift */,
 				520FF9001A09743363801D58 /* input */,
+				520FF0CF781D0CC8DB554293 /* SearchViewController.swift */,
+				520FFC803798B4FCE8841C23 /* SearchViewControllerHandler.swift */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -370,6 +382,9 @@
 				A9FCEDC520B424900055A071 /* FocusTvButton.swift */,
 				A9FCC97B20A032D700853DD3 /* MarqueeLabel.swift */,
 				520FFC53227222F172382263 /* FocusGuideRepresentation.swift */,
+				520FFC9E9A922E012A23E3C5 /* AnyCodable.swift */,
+				520FFCC0FED7B1865338FF72 /* AnyDecodable.swift */,
+				520FFB5F86A44FF1A21397DF /* AnyEncodable.swift */,
 			);
 			path = third_party;
 			sourceTree = "<group>";
@@ -638,6 +653,11 @@
 				520FFC1A920AF4B8AA2D6D0E /* SettingsViewController.swift in Sources */,
 				520FF6F4973900423DE53D85 /* MultipleChoiceListViewController.swift in Sources */,
 				520FF8D4DC96B9EF79F02E5F /* ListViewSelection.swift in Sources */,
+				520FFFFEBBEBB8DFA07477AA /* SearchViewController.swift in Sources */,
+				520FFEDD4EDA47203F26DAC1 /* SearchViewControllerHandler.swift in Sources */,
+				520FF5B6E5841161342AC1E6 /* AnyCodable.swift in Sources */,
+				520FF699C7A619827CFDCC7D /* AnyDecodable.swift in Sources */,
+				520FF07F21D8166393D926FC /* AnyEncodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,11 +26,12 @@ struct TwitchAccessToken: Codable {
     var refreshToken: String?
     var expiresIn: Int?
     var scope: String?
-    var error: Int?
+    var error: AnyCodable?
     var complete: Bool?
+    var message: String?
 
     private enum CodingKeys: String, CodingKey {
         case _accessToken = "access_token", refreshToken = "refresh_token", expiresIn = "expires_in", scope, error,
-                complete, token
+                complete, token, message
     }
 }

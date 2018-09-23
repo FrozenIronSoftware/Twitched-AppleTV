@@ -117,7 +117,7 @@ class TwitchApi {
                 do {
                     let data: TwitchAccessToken = try JSONDecoder().decode(TwitchAccessToken.self,
                             from: response.result.value!)
-                    if let _: Int = data.error {
+                    if let error = data.error, let _: Int = error.value as? Int {
                         callback(.TIMEOUT)
                     }
                     else if let complete: Bool = data.complete {
@@ -234,6 +234,62 @@ class TwitchApi {
         }
         // Get badge data
         getBadges()
+    }
+
+    /// Perform a search
+    static func search(parameters: Parameters, callback: @escaping (Array<TwitchStream>?) -> Void = { _ in },
+                       callbackGame: @escaping (Array<TwitchGame>?) -> Void = { _ in }, games: Bool = false) {
+        // Request
+        let url: String = API_KRAKEN + "/search"
+        os_log("Get request to %{public}@", url)
+        var params = parameters
+        if games {
+            params["type"] = "games"
+        }
+        request(url, parameters: params, headers: generateHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    if !games {
+                        let data: Array<TwitchStream> = try JSONDecoder().decode(Array<TwitchStream>.self,
+                                from: response.result.value!)
+                        callback(data)
+                    }
+                    else {
+                        let data: Array<TwitchGame> = try JSONDecoder().decode(Array<TwitchGame>.self,
+                                from: response.result.value!)
+                        callbackGame(data)
+                    }
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@",
+                            url,
+                            response.result.value.debugDescription)
+                    if games {
+                        callbackGame(nil)
+                    }
+                    else {
+                        callback(nil)
+                    }
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                if let errorData = response.data {
+                    print(String(data: errorData, encoding: .utf8) as Any)
+                }
+                if games {
+                    callbackGame(nil)
+                }
+                else {
+                    callback(nil)
+                }
+            }
+        }
+    }
+
+    /// Perform a search for a game
+    static func searchGames(parameters: Parameters, callback: @escaping (Array<TwitchGame>?) -> Void) {
+
     }
 
     /// Get global twitch badges
@@ -402,6 +458,9 @@ class TwitchApi {
                     os_log("Failed to parse JSON from %{public}@: %{public}@",
                             url,
                             response.result.value.debugDescription)
+                    if let errorData = response.data {
+                        print(String(data: errorData, encoding: .utf8) as Any)
+                    }
                     callback(nil)
                 }
             case .failure:
