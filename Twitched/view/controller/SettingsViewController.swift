@@ -152,12 +152,12 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
 
     /// Show the quality selection screen
     private func showQualitySelectionScreen() {
-        let languageSelect: MultipleChoiceListViewController = self.storyboard?.instantiateViewController(
+        let qualitySelect: MultipleChoiceListViewController = self.storyboard?.instantiateViewController(
                 withIdentifier: "multipleChoiceListViewController") as! MultipleChoiceListViewController
-        languageSelect.modalPresentationStyle = .blurOverFullScreen
-        languageSelect.modalTransitionStyle = .crossDissolve
-        languageSelect.titleText = "title.stream_quality".l10n()
-        languageSelect.selections = self.qualitySelections
+        qualitySelect.modalPresentationStyle = .blurOverFullScreen
+        qualitySelect.modalTransitionStyle = .crossDissolve
+        qualitySelect.titleText = "title.stream_quality".l10n()
+        qualitySelect.selections = self.qualitySelections
         // Enabled selections
         let cloud = NSUbiquitousKeyValueStore.default
         if let enabled: Array<String> = cloud.array(forKey: SettingsViewController.TWITCH_QUALITY_KEY)
@@ -165,19 +165,19 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
             for selection in self.qualitySelections {
                 if let code = selection.data {
                     if enabled.contains(code) {
-                        languageSelect.enabledSelections = [selection]
+                        qualitySelect.enabledSelections = [selection]
                         break
                     }
                 }
             }
-            if languageSelect.enabledSelections.count == 0 {
-                languageSelect.enabledSelections = [self.qualitySelections[0]]
+            if qualitySelect.enabledSelections.count == 0 {
+                qualitySelect.enabledSelections = [self.qualitySelections[0]]
             }
         }
-        languageSelect.singleSelection = true
-        languageSelect.selectionCallback = saveQualitySelection
+        qualitySelect.singleSelection = true
+        qualitySelect.selectionCallback = saveQualitySelection
         DispatchQueue.main.async(execute: {
-            self.present(languageSelect, animated: true)
+            self.present(qualitySelect, animated: true)
         })
     }
 
