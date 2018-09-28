@@ -34,7 +34,7 @@ class PosterItemCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         if let thumbnailRequest = thumbnailRequest {
-            thumbnailRequest.request.cancel()
+            ImageUtil.imageDownloader.cancelRequest(with: thumbnailRequest)
         }
         thumbnailRequest = nil
         thumbnail?.image = UIImage(named: Constants.IMAGE_LOADING_GAME_THUMBNAIL)
