@@ -39,7 +39,7 @@ class VideoCell: UICollectionViewCell {
     }
 
     /// Set the stream that this cell represents
-    func setStream(_ stream: TwitchStream) {
+    func setStream(_ stream: TwitchStream, gameThumbnail: Bool = true) {
         self.stream = stream
         titleLabel?.text = stream.title
         let isUser: Bool = stream.type == "user" || stream.type == "user_follow"
@@ -58,7 +58,7 @@ class VideoCell: UICollectionViewCell {
         setThumbnail(stream.thumbnailUrl, stream.gameName != nil ? stream.gameName! : "",
                 Int((self.thumbnail?.bounds.width)!),
                 Int((self.thumbnail?.bounds.height)!),
-                loadGame: !isUser)
+                loadGame: gameThumbnail && !isUser)
     }
 
     /// Set the background thumbnail with the game cover layered on top

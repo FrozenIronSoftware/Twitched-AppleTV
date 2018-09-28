@@ -277,7 +277,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         let streamIndex: Int = self.loadFollowedStreams && indexPath.section == 1 ?
             indexPath.item + counts.onlineCount : indexPath.item
         if let streams = self.streams, let stream = streams[safe: streamIndex] {
-            cell.setStream(stream)
+            cell.setStream(stream, gameThumbnail: self.gameId.isEmpty)
         }
         return cell
     }
