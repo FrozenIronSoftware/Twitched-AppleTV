@@ -79,8 +79,15 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
                             if streams.count == 1 {
                                 let stream: TwitchStream = streams[0]
                                 if stream.online {
-                                    let hlsUrl: String = TwitchApi.getHlsUrl(type: .STREAM, id: stream.userId)
-                                    self.fetchThumbnailThenPlayVideo(hlsUrl)
+                                    var userId = ":" + stream.userId
+                                    if let userName = stream.userName {
+                                        if !userName.login.isEmpty {
+                                            userId = userName.login
+                                        }
+                                    }
+                                    TwitchApi.getHlsUrl(type: .STREAM, id: userId) { hlsUrl, directTwitch in
+                                        self.fetchThumbnailThenPlayVideo(hlsUrl, directTwitch: directTwitch)
+                                    }
                                 }
                                 else {
                                     self.showOfflineAlert()
@@ -97,8 +104,9 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
                         }
                     })
                 case .VIDEO:
-                    let hlsUrl: String = TwitchApi.getHlsUrl(type: .VIDEO, id: id)
-                    self.fetchThumbnailThenPlayVideo(hlsUrl)
+                    TwitchApi.getHlsUrl(type: .VIDEO, id: id) { hlsUrl, directTwitch in
+                        self.fetchThumbnailThenPlayVideo(hlsUrl, directTwitch: directTwitch)
+                    }
             }
         }
     }
@@ -134,26 +142,28 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     }
 
     /// Fetch the thumbnal and play the video
-    private func fetchThumbnailThenPlayVideo(_ url: String) {
+    private func fetchThumbnailThenPlayVideo(_ url: String, directTwitch: Bool) {
         if let thumbnailUrl: String = self.thumbnailUrl {
             let _ = ImageUtil.imageFromUrl(url: thumbnailUrl, completion: { response in
                 if let image: UIImage = response {
                     self.thumbnail = image
                 }
-                self.playVideo(url)
+                self.playVideo(url, directTwitch: directTwitch)
             })
         }
         else {
-            playVideo(url)
+            playVideo(url, directTwitch: directTwitch)
         }
     }
 
     /// Play a video
-    private func playVideo(_ url: String) {
+    private func playVideo(_ url: String, directTwitch: Bool) {
         // Construct player
+        let playlistUrl = directTwitch ? url : url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         let playerAsset: AVURLAsset =  AVURLAsset(url: URL(
-                string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!, options: [
-            "AVURLAssetHTTPHeaderFieldsKey": TwitchApi.generateHeaders() as Any
+                string: playlistUrl)!, options: [
+            "AVURLAssetHTTPHeaderFieldsKey": (directTwitch ? TwitchApi.generateTwitchHeaders() :
+                    TwitchApi.generateHeaders()) as Any
         ])
         let playerItem: AVPlayerItem = AVPlayerItem(asset: playerAsset)
         playerItem.externalMetadata = generateMetadata()
@@ -246,6 +256,9 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     private func handleVideoItemStatusChange(_ status: AVPlayerItemStatus) {
         switch status {
             case .failed, .unknown:
+                if status == .failed {
+                    print(self.player?.currentItem?.error as Any)
+                }
                 handleVideoError()
             case .readyToPlay:
                 break

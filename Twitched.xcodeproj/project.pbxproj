@@ -53,6 +53,7 @@
 		520FFE1856A1A737045D0D4E /* TwitchedLinkId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF4A9C342EF5409265E71 /* TwitchedLinkId.swift */; };
 		520FFEDD4EDA47203F26DAC1 /* SearchViewControllerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFC803798B4FCE8841C23 /* SearchViewControllerHandler.swift */; };
 		520FFF0C7D6CD13907C2603B /* IrcMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FFDC2DC014FC100C9987F /* IrcMessage.swift */; };
+		520FFF2B3F49DE3EC9FE7463 /* TwitchVideoAccessToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF87B7F4D12D78018933F /* TwitchVideoAccessToken.swift */; };
 		520FFF9878F53EB575B14874 /* TwitchGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF9533175CC293F41A2AA /* TwitchGame.swift */; };
 		520FFFAA22B687D4D0E8215C /* ImageUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF98C71FABF603A7C49B4 /* ImageUtil.swift */; };
 		520FFFC145B25490C2BC3766 /* VideoGridViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520FF35D422D4840ECBFF866 /* VideoGridViewController.swift */; };
@@ -121,6 +122,7 @@
 		520FF862DBB6424CEE37E5CE /* TwitchApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchApi.swift; sourceTree = "<group>"; };
 		520FF863F95BC41252C56E2F /* TwitchGameFollowStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchGameFollowStatus.swift; path = Twitched/data/json/TwitchGameFollowStatus.swift; sourceTree = SOURCE_ROOT; };
 		520FF87A953ED8A0E4788D4B /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
+		520FF87B7F4D12D78018933F /* TwitchVideoAccessToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchVideoAccessToken.swift; sourceTree = "<group>"; };
 		520FF90AF0D2F9F93ACF6B15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		520FF9533175CC293F41A2AA /* TwitchGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwitchGame.swift; path = Twitched/data/json/TwitchGame.swift; sourceTree = SOURCE_ROOT; };
 		520FF98C71FABF603A7C49B4 /* ImageUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageUtil.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				520FF2F2F80DA17C63F96ABC /* TwitchStream.swift */,
 				520FFEF5CCB6971AEB1AD7E6 /* TwitchUserName.swift */,
 				520FF451309219761ACFBC10 /* TwitchCommunity.swift */,
+				520FF87B7F4D12D78018933F /* TwitchVideoAccessToken.swift */,
 			);
 			path = json;
 			sourceTree = "<group>";
@@ -658,6 +661,7 @@
 				520FF5B6E5841161342AC1E6 /* AnyCodable.swift in Sources */,
 				520FF699C7A619827CFDCC7D /* AnyDecodable.swift in Sources */,
 				520FF07F21D8166393D926FC /* AnyEncodable.swift in Sources */,
+				520FFF2B3F49DE3EC9FE7463 /* TwitchVideoAccessToken.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

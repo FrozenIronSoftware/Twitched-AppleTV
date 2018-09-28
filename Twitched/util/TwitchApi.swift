@@ -13,7 +13,10 @@ class TwitchApi {
     private static var API_HELIX: String = ""
     private static var API_KRAKEN: String = ""
     private static var API: String = ""
+    private static var API_RAW: String = "https://api.twitch.tv/api"
+    private static var API_USHER: String = "https://usher.ttvnw.net"
     private static var CLIENT_ID: String = ""
+    private static var CLIENT_ID_TWITCH: String = ""
     private static let GAME_THUMBNAIL_URL: String = "https://static-cdn.jtvnw.net/ttv-boxart/%@-%@x%@.jpg"
     private static let ACCESS_TOKEN_KEY: String = "auth.access_token"
     private static let LOGIN_INTERVAL: TimeInterval = 60 * 60 // One hour
@@ -216,6 +219,7 @@ class TwitchApi {
                 let config: Dictionary<String, Any> = try JSONSerialization.jsonObject(with: configString.data(using: .utf8)!)
                         as! Dictionary<String, Any>
                 CLIENT_ID = config["client_id"] as! String
+                CLIENT_ID_TWITCH = config["client_id_twitch"] as! String
                 API_HELIX = config["api_helix"] as! String
                 API_KRAKEN = config["api_kraken"] as! String
                 API = config["api"] as! String
@@ -625,7 +629,7 @@ class TwitchApi {
     }
 
     /// Get HLS url for a stream
-    static func getHlsUrl(type: VideoType, id: String) -> String {
+    static func getHlsUrl(type: VideoType, id: String, callback: @escaping (String, Bool) -> Void) -> Void {
         let cloud = NSUbiquitousKeyValueStore.default
         let qualityArray = cloud.array(forKey: SettingsViewController.TWITCH_QUALITY_KEY)
         var quality = "1080p"
@@ -634,11 +638,17 @@ class TwitchApi {
                 quality = qualityArray[0]
             }
         }
-        switch type {
+        getTwitchPlaylistUrl(type: type, quality: quality, id: id) { localPlaylist in
+            if let localPlaylist = localPlaylist {
+                callback(localPlaylist, true)
+                return
+            }
+            switch type {
             case .STREAM:
-                return String(format: "%@/twitch/hls/60/%@/ATV/:%@.m3u8", arguments: [API, quality, id])
+                callback(String(format: "%@/twitch/hls/60/%@/ATV/%@.m3u8", arguments: [API, quality, id]), false)
             case .VIDEO:
-                return String(format: "%@/twitch/vod/60/%@/ATV/%@.m3u8", arguments: [API, quality, id])
+                callback(String(format: "%@/twitch/vod/60/%@/ATV/%@.m3u8", arguments: [API, quality, id]), false)
+            }
         }
     }
 
@@ -850,6 +860,110 @@ class TwitchApi {
             case .failure:
                 os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
                 callback(nil)
+            }
+        }
+    }
+
+    /// Fetch a video access token for the current user if they are logged in.
+    /// @param type video type
+    /// @param id streamer username or video id
+    /// @param completion video access token or nil on error
+    private static func getVideoAccessToken(type: TwitchApi.VideoType, id: String, completion:
+            @escaping (TwitchVideoAccessToken?) -> Void) -> Void {
+        var url: String
+        switch type {
+        case .STREAM:
+            url = String(format: "%@/channels/%@/access_token", arguments: [API_RAW, id])
+        case .VIDEO:
+            url = String(format: "%@/vods/%@/access_token", arguments: [API_RAW, id])
+        }
+        request(url, headers: generateTwitchHeaders()).validate().responseData { response in
+            switch response.result {
+            case .success:
+                do {
+                    let token: TwitchVideoAccessToken = try JSONDecoder().decode(TwitchVideoAccessToken.self,
+                            from: response.result.value!)
+                    completion(token)
+                }
+                catch {
+                    os_log("Failed to parse JSON from %{public}@: %{public}@", url,
+                            response.result.value.debugDescription)
+                    completion(nil)
+                }
+            case .failure:
+                os_log("Failed to get %{public}@: %{public}@", url, response.error.debugDescription)
+                completion(nil)
+            }
+        }
+    }
+
+    /// Generate headers for communicating with Twitch directly
+    static func generateTwitchHeaders() -> HTTPHeaders {
+        var headers: HTTPHeaders = [
+            "Client-ID": CLIENT_ID_TWITCH,
+            "User-Agent": generateUserAgent()
+        ]
+        if let accessToken: TwitchAccessToken = TwitchApi.accessToken {
+            if let accessTokenString: String = accessToken.accessToken {
+                headers["Authorization"] = "OAuth " + accessTokenString
+            }
+        }
+        return headers
+    }
+
+    /// Get a raw M3U8 playlist url for Twitch
+    private static func getHlsPlaylistUrl(type: TwitchApi.VideoType, id: String, token: TwitchVideoAccessToken) -> String? {
+        var url: String
+        switch type {
+        case .STREAM:
+            url = String(format: "%@/api/channel/hls/%@.m3u8", arguments: [API_USHER, id])
+        case .VIDEO:
+            url = String(format: "%@/vod/%@.m3u8", arguments: [API_USHER, id])
+        }
+        var params = HTTPHeaders()
+        params["player"] = "Twitched"
+        params["p"] = String(Int(arc4random_uniform(UInt32.max)))
+        params["type"] = "any"
+        params["allow_audio_only"] = "true"
+        params["allow_source"] = "true"
+        switch type {
+        case .STREAM:
+            params["token"] = token.token
+            params["sig"] = token.sig
+        case .VIDEO:
+            params["nauth"] = token.token
+            params["nauthsig"] = token.sig
+        }
+        var queryItems = Array<URLQueryItem>()
+        for param in params.keys {
+            queryItems.append(URLQueryItem(name: param, value: params[param]))
+        }
+        let urlComponents = NSURLComponents(string: url)
+        if let urlComponents = urlComponents {
+            urlComponents.queryItems = queryItems
+            if let urlConstructed = urlComponents.url {
+                return urlConstructed.absoluteString
+            }
+            else {
+                return nil
+            }
+        }
+        else {
+            return nil
+        }
+    }
+
+    /// Attempts to download a Twitch playlist and adds it to a local server
+    /// @param completion m3u8 url or nil on error
+    private static func getTwitchPlaylistUrl(type: TwitchApi.VideoType, quality: String, id: String,
+                              completion: @escaping (String?) -> Void) -> Void {
+        TwitchApi.getVideoAccessToken(type: type, id: id) { token in
+            if let token = token {
+                let playlistUrl = TwitchApi.getHlsPlaylistUrl(type: type, id: id, token: token)
+                completion(playlistUrl)
+            }
+            else {
+                completion(nil)
             }
         }
     }
