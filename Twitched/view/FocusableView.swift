@@ -16,8 +16,8 @@ class FocusableView: UIView, CallbackActionHandler {
         let tapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self,
                 action: #selector(self.selected(sender:)))
         tapRecognizer.allowedPressTypes = [
-            NSNumber(value: UIPressType.select.rawValue),
-            NSNumber(value: UIPressType.playPause.rawValue)
+            NSNumber(value: UIPress.PressType.select.rawValue),
+            NSNumber(value: UIPress.PressType.playPause.rawValue)
         ]
         self.addGestureRecognizer(tapRecognizer)
     }

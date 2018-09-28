@@ -502,6 +502,7 @@
 				TargetAttributes = {
 					520FF852E887B1617420C8B1 = {
 						DevelopmentTeam = 3VFKFKNE8P;
+						LastSwiftMigration = 1000;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 1;
@@ -704,7 +705,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.frozenironsoftware.Twitched;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 3;
 				VERSIONING_SYSTEM = "";
 			};
@@ -726,7 +727,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.frozenironsoftware.Twitched;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 3;
 				VERSIONING_SYSTEM = "";
 			};

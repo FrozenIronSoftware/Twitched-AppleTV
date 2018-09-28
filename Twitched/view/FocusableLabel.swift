@@ -70,16 +70,16 @@ class FocusableLabel: UIControl {
         // Setup tap recognizer
         let tapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self,
                 action: #selector(self.selected(sender:)))
-        tapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+        tapRecognizer.allowedPressTypes = [NSNumber(value: UIPress.PressType.select.rawValue)]
         self.addGestureRecognizer(tapRecognizer)
         // Application active event
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                name: .UIApplicationDidBecomeActive, object: nil)
+                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     override func removeFromSuperview() {
         super.removeFromSuperview()
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     override func draw(_ rect: CGRect) {

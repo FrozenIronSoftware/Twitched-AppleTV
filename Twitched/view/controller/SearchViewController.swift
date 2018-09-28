@@ -39,10 +39,10 @@ class SearchViewController: UIViewController {
         searchContainerViewController.restorationIdentifier = "searchContainerViewController"
         searchContainerViewController.view.frame = CGRect(x: self.view.frame.minX, y: self.view.frame.minY,
                 width: self.view.frame.width, height: self.view.frame.height)
-        searchContainerViewController.willMove(toParentViewController: self)
-        self.addChildViewController(searchContainerViewController)
+        searchContainerViewController.willMove(toParent: self)
+        self.addChild(searchContainerViewController)
         self.view.addSubview(searchContainerViewController.view)
-        searchContainerViewController.didMove(toParentViewController: self)
+        searchContainerViewController.didMove(toParent: self)
 
         // Segment
         if let searchType = searchType {
@@ -60,10 +60,10 @@ class SearchViewController: UIViewController {
         videoGrid.headerTitle = ""
         videoGrid.noHeader = true
         videoGrid.view.clipsToBounds = true
-        videoGrid.willMove(toParentViewController: self)
-        self.addChildViewController(videoGrid)
+        videoGrid.willMove(toParent: self)
+        self.addChild(videoGrid)
         self.view.addSubview(videoGrid.view)
-        videoGrid.didMove(toParentViewController: self)
+        videoGrid.didMove(toParent: self)
 
         // Game grid
         posterGrid = self.storyboard?.instantiateViewController(withIdentifier: "gameListVIewController") as!
@@ -72,10 +72,10 @@ class SearchViewController: UIViewController {
                 width: self.view.frame.width, height: self.view.frame.height - 400)
         posterGrid.noHeader = true
         posterGrid.loadFollowed = false
-        posterGrid.willMove(toParentViewController: self)
-        self.addChildViewController(posterGrid)
+        posterGrid.willMove(toParent: self)
+        self.addChild(posterGrid)
         self.view.addSubview(posterGrid.view)
-        posterGrid.didMove(toParentViewController: self)
+        posterGrid.didMove(toParent: self)
         posterGrid.view.isHidden = true
     }
 

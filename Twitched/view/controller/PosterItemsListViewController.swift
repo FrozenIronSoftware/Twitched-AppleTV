@@ -84,13 +84,13 @@ class PosterItemsListViewController: UIViewController, UITableViewDelegate, UITa
             loadAllItemsWithReset()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                name: .UIApplicationDidBecomeActive, object: nil)
+                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     /// Disappear
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     /// Load top games

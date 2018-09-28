@@ -18,7 +18,7 @@ class FocusableTextView: UITextView, CallbackActionHandler {
         // Setup tap recognizer
         let tapRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self,
                 action: #selector(self.selected(sender:)))
-        tapRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+        tapRecognizer.allowedPressTypes = [NSNumber(value: UIPress.PressType.select.rawValue)]
         self.addGestureRecognizer(tapRecognizer)
     }
 

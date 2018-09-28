@@ -37,7 +37,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                name: .UIApplicationDidBecomeActive, object: nil)
+                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     @objc func applicationDidBecomeActive() {
@@ -47,7 +47,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     /// Disappear
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
         if let player = player {
             player.removeObserver(self, forKeyPath: #keyPath(AVPlayer.status))
             if let item = player.currentItem {
@@ -191,9 +191,9 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         playerViewController.contentOverlayView?.backgroundColor = .clear
         playerViewController.contentOverlayView?.addSubview(backgroundView)
         playerViewController.contentOverlayView?.layer.addSublayer(playerLayer)
-        self.addChildViewController(playerViewController)
+        self.addChild(playerViewController)
         self.view.addSubview(playerViewController.view)
-        playerViewController.didMove(toParentViewController: self)
+        playerViewController.didMove(toParent: self)
         playerViewController.delegate = self
         self.playerViewController = playerViewController
         self.playerLayer = playerLayer
@@ -241,10 +241,10 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         if keyPath == #keyPath(AVPlayerItem.status) || keyPath == #keyPath(AVPlayer.status) {
             if let change = change {
                 if let statusRawValue: Int = change[.newKey] as? Int {
-                    if let status: AVPlayerStatus = AVPlayerStatus(rawValue: statusRawValue) {
+                    if let status: AVPlayer.Status = AVPlayer.Status(rawValue: statusRawValue) {
                         handleVideoStatusChange(status)
                     }
-                    else if let status: AVPlayerItemStatus = AVPlayerItemStatus(rawValue: statusRawValue) {
+                    else if let status: AVPlayerItem.Status = AVPlayerItem.Status(rawValue: statusRawValue) {
                         handleVideoItemStatusChange(status)
                     }
                 }
@@ -253,7 +253,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     }
 
     /// Handle the player item status change
-    private func handleVideoItemStatusChange(_ status: AVPlayerItemStatus) {
+    private func handleVideoItemStatusChange(_ status: AVPlayerItem.Status) {
         switch status {
             case .failed, .unknown:
                 if status == .failed {
@@ -266,8 +266,8 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
     }
 
     /// Handle the player's status change
-    private func handleVideoStatusChange(_ status: AVPlayerStatus) {
-        handleVideoItemStatusChange(AVPlayerItemStatus(rawValue: status.rawValue)!)
+    private func handleVideoStatusChange(_ status: AVPlayer.Status) {
+        handleVideoItemStatusChange(AVPlayerItem.Status(rawValue: status.rawValue)!)
     }
 
     /// Set thumbnail url
@@ -315,7 +315,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
             thumbnail.identifier = AVMetadataIdentifier.commonIdentifierArtwork
             thumbnail.keySpace = .common
             thumbnail.locale = .current
-            thumbnail.value = NSData(data: UIImagePNGRepresentation(thumbnailMeta)!)
+            thumbnail.value = NSData(data: thumbnailMeta.pngData()!)
             metadata.append(thumbnail)
         }
         return metadata
@@ -441,7 +441,7 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
                 }
                 UIView.animate(withDuration: 0.2, animations: {
                     if let chat = self.chat {
-                        self.view.bringSubview(toFront: chat)
+                        self.view.bringSubviewToFront(chat)
                         chat.frame = chat.frame.offsetBy(dx: chat.frame.width, dy: 0)
                     }
                 }, completion: { _ in

@@ -18,7 +18,7 @@ class ChatView: UIView {
         super.awakeFromNib()
         // Listen for application becoming active
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                name: .UIApplicationDidBecomeActive, object: nil)
+                name: UIApplication.didBecomeActiveNotification, object: nil)
         setBackgroundColor()
     }
 
@@ -26,7 +26,7 @@ class ChatView: UIView {
     override func removeFromSuperview() {
         super.removeFromSuperview()
         NotificationCenter.default.removeObserver(self, name: .IrcChatMessage, object: irc)
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
         disconnect()
     }
 
@@ -94,8 +94,8 @@ class ChatView: UIView {
                 }
                 let name = NSAttributedString(string: message.name,
                         attributes: [
-                            NSAttributedStringKey.foregroundColor: self.shiftColorForStyle(message.color),
-                            NSAttributedStringKey.backgroundColor: UIColor.clear
+                            NSAttributedString.Key.foregroundColor: self.shiftColorForStyle(message.color),
+                            NSAttributedString.Key.backgroundColor: UIColor.clear
                         ])
                 attributedMessage.append(name)
                 // Add emotes

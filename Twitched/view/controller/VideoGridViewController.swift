@@ -81,7 +81,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             populateCollectionViewWithReset()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                name: .UIApplicationDidBecomeActive, object: nil)
+                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     /// Poll the API for search results, then populate the grid
@@ -105,14 +105,14 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     /// Disappear
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     // Appeared
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // Save initial header position
-        if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+        if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionView.elementKindSectionHeader,
                 at: IndexPath(item: 0, section: 0)) {
             self.initialHeaderBounds = header.bounds
         }
@@ -130,7 +130,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                         DispatchQueue.main.async(execute: {
                             followedLoginMessageView.alpha = 1
                             followedLoginMessageView.isUserInteractionEnabled = true
-                            self.view.bringSubview(toFront: followedLoginMessageView)
+                            self.view.bringSubviewToFront(followedLoginMessageView)
                         })
                     }
                 })
@@ -142,7 +142,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         // Reset header position
-        if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+        if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionView.elementKindSectionHeader,
                 at: IndexPath(item: 0, section: 0)) {
             if let bounds = self.initialHeaderBounds {
                 header.bounds = bounds
@@ -309,7 +309,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
             UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
                 cell.getThumbnail()?.transform = CGAffineTransform(scaleX: 1, y: 1)
             }, completion: { _ in
-                UIView.animate(withDuration: 0.4, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
+                UIView.animate(withDuration: 0.4, delay: 0, options: UIView.AnimationOptions.curveEaseIn, animations: {
                     self.view.transform = CGAffineTransform(scaleX: 1.4, y: 1.4)
                     self.view.alpha = 0
                 }, completion: { _ in
@@ -346,7 +346,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
                         with coordinator: UIFocusAnimationCoordinator) {
         // Move the header title if the cell focused is the first item
         if let indexPath = context.nextFocusedIndexPath {
-            if let header = collectionView.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+            if let header = collectionView.supplementaryView(forElementKind: UICollectionView.elementKindSectionHeader,
                     at: IndexPath(item: 0, section: 0)) {
                 if indexPath.section == 0 && (indexPath.item == 0 || (indexPath.item == 3 && isFollowButtonEnabled)) {
                     if let initialHeaderBounds =  self.initialHeaderBounds {
@@ -384,7 +384,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
         }
         // Reset the header title if the focus is not a video cell
         else {
-            if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionElementKindSectionHeader,
+            if let header = self.collectionView?.supplementaryView(forElementKind: UICollectionView.elementKindSectionHeader,
                     at: IndexPath(item: 0, section: 0)) {
                 if let bounds = self.initialHeaderBounds {
                     UIView.animate(withDuration: 0.2, animations: {
@@ -408,7 +408,7 @@ class VideoGridViewController: UIViewController, UICollectionViewDataSource, UIC
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
         let header: TextHeader = collectionView.dequeueReusableSupplementaryView(
-                ofKind: UICollectionElementKindSectionHeader,
+                ofKind: UICollectionView.elementKindSectionHeader,
                 withReuseIdentifier: "header", for: indexPath) as! TextHeader
         if self.noHeader {
             // Set the collection view frame

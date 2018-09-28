@@ -44,7 +44,7 @@ class VideoOnDemandCell: UICollectionViewCell {
         super.awakeFromNib()
         // Listen for application becoming active
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                name: .UIApplicationDidBecomeActive, object: nil)
+                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     /// Handle application becoming active
@@ -55,7 +55,7 @@ class VideoOnDemandCell: UICollectionViewCell {
     /// Deinit
     override func removeFromSuperview() {
         super.removeFromSuperview()
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     /// Handle focus
