@@ -62,7 +62,6 @@
 		A9179B112103A14E00FDA6B8 /* Regex.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9179B102103A14E00FDA6B8 /* Regex.framework */; };
 		A9179B1621051E8C00FDA6B8 /* TwitchBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9179B1521051E8C00FDA6B8 /* TwitchBadges.swift */; };
 		A9179B182109013F00FDA6B8 /* AlamofireImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9179B172109013F00FDA6B8 /* AlamofireImage.framework */; };
-		A934296D20AAE44A00521B3A /* ReLax.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A934296C20AAE44A00521B3A /* ReLax.framework */; };
 		A94FE53E20A8017400EC19A2 /* L10n_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A94FE53D20A8017400EC19A2 /* L10n_swift.framework */; };
 		A95B02FA20A818F3004B39C2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A95B02F920A818F3004B39C2 /* Main.storyboard */; };
 		A95B030420A81CBE004B39C2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A95B030220A81CBE004B39C2 /* Localizable.strings */; };
@@ -183,7 +182,6 @@
 				A9179B182109013F00FDA6B8 /* AlamofireImage.framework in Frameworks */,
 				A9179B112103A14E00FDA6B8 /* Regex.framework in Frameworks */,
 				A98C939720EB927B009DB42D /* SocketSwift.framework in Frameworks */,
-				A934296D20AAE44A00521B3A /* ReLax.framework in Frameworks */,
 				A94FE53E20A8017400EC19A2 /* L10n_swift.framework in Frameworks */,
 				A9EE5B1A20A0160800DA5F5E /* QuartzCore.framework in Frameworks */,
 				A99B7BF1209ACB2E00229725 /* Alamofire.framework in Frameworks */,
@@ -570,7 +568,6 @@
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/tvOS/Alamofire.framework",
 				"$(SRCROOT)/Carthage/Build/tvOS/L10n_swift.framework",
-				"$(SRCROOT)/Carthage/Build/tvOS/ReLax.framework",
 				"$(SRCROOT)/Carthage/Build/tvOS/SocketSwift.framework",
 				"$(SRCROOT)/Carthage/Build/tvOS/Regex.framework",
 				"$(SRCROOT)/Carthage/Build/tvOS/AlamofireImage.framework",
@@ -578,14 +575,13 @@
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Alamofire.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/L10n_swift.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ReLax.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/SocketSwift.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Regex.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/AlamofireImage.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ -f ~/.profile ]; then\n    source ~/.profile\nfi\ncarthage=$(/usr/bin/which carthage)\n$(\"$carthage\" copy-frameworks)";
+			shellScript = "if [ -f ~/.profile ]; then\n    source ~/.profile\nfi\ncarthage=$(/usr/bin/which carthage)\n$(\"$carthage\" copy-frameworks)\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

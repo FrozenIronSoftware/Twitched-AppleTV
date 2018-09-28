@@ -9,7 +9,6 @@
 import UIKit
 import L10n_swift
 import Alamofire
-import ReLax
 
 class VideoCell: UICollectionViewCell {
 
@@ -84,11 +83,15 @@ class VideoCell: UICollectionViewCell {
                                     alignHoriz: ImageUtil.Alignment.RIGHT,
                                     alignVert: ImageUtil.Alignment.BOTTOM,
                                     size: CGSize(width: width, height: height))
-                            let parallaxImage: ParallaxImage = ParallaxImage(images: [
-                                expandedGameImage,
-                                UIImage(data: thumbData)!
-                            ])
-                            self.thumbnail?.image = parallaxImage.image()
+                            let thumbImage = UIImage(data: thumbData)!
+                            UIGraphicsBeginImageContextWithOptions(thumbImage.size, false, 0.0)
+                            thumbImage.draw(in: CGRect(x: 0, y: 0, width: thumbImage.size.width,
+                                    height: thumbImage.size.height))
+                            expandedGameImage.draw(in: CGRect(x: 0, y: 0, width: thumbImage.size.width,
+                                    height: thumbImage.size.height))
+                            let combined = UIGraphicsGetImageFromCurrentImageContext()!
+                            UIGraphicsEndImageContext()
+                            self.thumbnail?.image = combined
                         }
                         else {
                             self.thumbnail?.image = UIImage(data: thumbData)

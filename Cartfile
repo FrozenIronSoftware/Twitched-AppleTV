@@ -1,6 +1,5 @@
 github "Alamofire/Alamofire" == 4.7.2
 github "Decybel07/L10n-swift" == 5.2.1
-github "Asynchrony/Re-Lax" == 1.0.3
 github "FrozenIronSoftware/Socket.swift" == 2.2.2
 github "FrozenIronSoftware/Regex" == 1.1.1
 github "Alamofire/AlamofireImage" == 3.3.1
