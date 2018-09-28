@@ -1,5 +1,5 @@
-github "Alamofire/Alamofire" "4.7.2"
-github "Alamofire/AlamofireImage" "3.3.1"
+github "Alamofire/Alamofire" "4.7.3"
+github "Alamofire/AlamofireImage" "3.4.1"
 github "Decybel07/L10n-swift" "5.2.1"
 github "FrozenIronSoftware/Regex" "v1.1.1"
 github "FrozenIronSoftware/Socket.swift" "2.2.2"
