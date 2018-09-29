@@ -345,7 +345,7 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
     public var animationDuration: CGFloat {
         switch self.speed {
         case .rate(let rate):
-            return CGFloat(fabs(self.awayOffset) / rate)
+            return CGFloat(abs(self.awayOffset) / rate)
         case .duration(let duration):
             return duration
         }
@@ -633,7 +633,7 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
             // Find when the lead label will be totally offscreen
             let offsetDistance = awayOffset
             let offscreenAmount = homeLabelFrame.size.width
-            let startFadeFraction = fabs(offscreenAmount / offsetDistance)
+            let startFadeFraction = abs(offscreenAmount / offsetDistance)
             // Find when the animation will hit that point
             let startFadeTimeFraction = timingFunctionForAnimationCurve(animationCurve).durationPercentageForPositionPercentage(startFadeFraction, duration: (animationDelay + animationDuration))
             let startFadeTime = startFadeTimeFraction * animationDuration
@@ -840,11 +840,6 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
         #endif
         
         scrollCompletionBlock = { [weak self] (finished: Bool) -> () in
-            guard finished else {
-                // Do not continue into the next loop
-                return
-            }
-            
             guard (self != nil) else {
                 return
             }
@@ -853,15 +848,25 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
             self!.labelReturnedToHome(true)
             
             // Check to ensure that:
-            // 1) We don't double fire if an animation already exists
-            // 2) The instance is still attached to a window - this completion block is called for
+            
+            // 1) The instance is still attached to a window - this completion block is called for
             //    many reasons, including if the animation is removed due to the view being removed
             //    from the UIWindow (typically when the view controller is no longer the "top" view)
             guard self!.window != nil else {
                 return
             }
-            
+            // 2) We don't double fire if an animation already exists
             guard self!.sublabel.layer.animation(forKey: "position") == nil else {
+                return
+            }
+            // 3) We don't not start automatically if the animation was unexpectedly interrupted
+            guard finished else {
+                // Do not continue into the next loop
+                return
+            }
+            // 4) A completion block still exists for the NEXT loop. A notable case here is if
+            // returnLabelToHome() was called during a subclass's labelReturnToHome() function
+            guard (self!.scrollCompletionBlock != nil) else {
                 return
             }
             
@@ -878,7 +883,7 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
         if type == .left || type == .right {
             // Make it stay at away permanently
             scroller.anim.isRemovedOnCompletion = false
-            scroller.anim.fillMode = CAMediaTimingFillMode.forwards
+            scroller.anim.fillMode = .forwards
         }
         sublabel.layer.add(scroller.anim, forKey: "position")
         
@@ -1079,7 +1084,7 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
             let colorAnimation = GradientSetupAnimation(keyPath: "colors")
             colorAnimation.fromValue = gradientMask.colors
             colorAnimation.toValue = adjustedColors
-            colorAnimation.fillMode = CAMediaTimingFillMode.forwards
+            colorAnimation.fillMode = .forwards
             colorAnimation.isRemovedOnCompletion = false
             colorAnimation.delegate = self
             gradientMask.add(colorAnimation, forKey: "setupFade")
@@ -1094,20 +1099,20 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
     }
     
     private func timingFunctionForAnimationCurve(_ curve: UIView.AnimationCurve) -> CAMediaTimingFunction {
-        let timingFunction: String?
+        let timingFunction: CAMediaTimingFunctionName?
         
         switch curve {
         case .easeIn:
-            timingFunction = convertFromCAMediaTimingFunctionName(CAMediaTimingFunctionName.easeIn)
+            timingFunction = .easeIn
         case .easeInOut:
-            timingFunction = convertFromCAMediaTimingFunctionName(CAMediaTimingFunctionName.easeInEaseOut)
+            timingFunction = .easeInEaseOut
         case .easeOut:
-            timingFunction = convertFromCAMediaTimingFunctionName(CAMediaTimingFunctionName.easeOut)
+            timingFunction = .easeOut
         default:
-            timingFunction = convertFromCAMediaTimingFunctionName(CAMediaTimingFunctionName.linear)
+            timingFunction = .linear
         }
         
-        return CAMediaTimingFunction(name: convertToCAMediaTimingFunctionName(timingFunction!))
+        return CAMediaTimingFunction(name: timingFunction!)
     }
     
     private func transactionDurationType(_ labelType: MarqueeType, interval: CGFloat, delay: CGFloat) -> TimeInterval {
@@ -1250,6 +1255,7 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
      
      - SeeAlso: restartLabel
      */
+    @available(*, deprecated : 3.1.6, message : "Use the shutdownLabel function instead")
     public func resetLabel() {
         returnLabelToHome()
         homeLabelFrame = CGRect.null
@@ -1781,14 +1787,14 @@ fileprivate extension CAMediaTimingFunction {
             // Calculate f(t0)
             f0 = YforCurveAt(t0, controlPoints:controlPoints) - y_0
             // Check if this is close (enough)
-            if (fabs(f0) < epsilon) {
+            if (abs(f0) < epsilon) {
                 // Done!
                 return t0
             }
             // Else continue Newton's Method
             df0 = derivativeCurveYValueAt(t0, controlPoints:controlPoints)
             // Check if derivative is small or zero ( http://en.wikipedia.org/wiki/Newton's_method#Failure_analysis )
-            if (fabs(df0) < 1e-6) {
+            if (abs(df0) < 1e-6) {
                 break
             }
             // Else recalculate t1
@@ -1855,15 +1861,4 @@ fileprivate extension CAMediaTimingFunction {
         
         return pointArray
     }
-}
-
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromCAMediaTimingFunctionName(_ input: CAMediaTimingFunctionName) -> String {
-	return input.rawValue
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToCAMediaTimingFunctionName(_ input: String) -> CAMediaTimingFunctionName {
-	return CAMediaTimingFunctionName(rawValue: input)
 }
