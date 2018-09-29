@@ -509,6 +509,9 @@
 							};
 						};
 					};
+					520FF90A1534C99A208A9D74 = {
+						LastSwiftMigration = 1000;
+					};
 				};
 			};
 			buildConfigurationList = 520FFF810618B567515B15DF /* Build configuration list for PBXProject "Twitched" */;
@@ -754,7 +757,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.frozenironsoftware.TwitchedTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 3;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
@@ -894,7 +897,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.frozenironsoftware.TwitchedTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 3;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
