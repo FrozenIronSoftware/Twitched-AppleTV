@@ -171,7 +171,24 @@ class VideoViewController: UIViewController, AVPlayerViewControllerDelegate {
         let playerLayer: AVPlayerLayer = AVPlayerLayer(player: player)
         playerLayer.frame = self.view.frame
         playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        // Background view
+        // Bitrate
+        let cloud = NSUbiquitousKeyValueStore.default
+        if let qualityString = cloud.array(forKey: SettingsViewController.TWITCH_QUALITY_KEY)?.first as? String {
+            let quality = Int(qualityString.replacingOccurrences(of: "p", with: ""))
+            switch quality {
+            case 240:
+                playerItem.preferredMaximumResolution = CGSize(width: 426, height: 240)
+            case 480:
+                playerItem.preferredMaximumResolution = CGSize(width: 854, height: 480)
+            case 720:
+                playerItem.preferredMaximumResolution = CGSize(width: 1280, height: 720)
+            case 1080:
+                playerItem.preferredMaximumResolution = CGSize(width: 1920, height: 1080)
+            default:
+                playerItem.preferredMaximumResolution = .zero
+            }
+        }
+        // Background vieww
         let backgroundView: UIView = UIView(frame: self.view.frame)
         if self.traitCollection.userInterfaceStyle == UIUserInterfaceStyle.light {
             backgroundView.backgroundColor = UIColor.lightGray
