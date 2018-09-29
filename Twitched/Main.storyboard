@@ -1274,10 +1274,6 @@
                                     <outlet property="delegate" destination="E8R-0t-KWr" id="d5T-ix-Ys3"/>
                                 </connections>
                             </tableView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="logoImage" translatesAutoresizingMaskIntoConstraints="NO" id="K2t-C5-8QV" userLabel="logoImage">
-                                <rect key="frame" x="355" y="476" width="240" height="128"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="settingsLabel" text="Settings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NHW-IO-Yj3" userLabel="settingsLabel">
                                 <rect key="frame" x="889" y="60" width="143" height="46"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1285,6 +1281,10 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" restorationIdentifier="logoImage" image="SettingsIcon" translatesAutoresizingMaskIntoConstraints="NO" id="K2t-C5-8QV" userLabel="logoImage">
+                                <rect key="frame" x="189" y="441" width="584" height="198"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Cqr-Kj-oxz"/>
                     </view>
@@ -1396,6 +1396,7 @@
         <image name="Follow Button" width="80" height="75"/>
         <image name="Game Thumbnail Loading Image" width="240" height="320"/>
         <image name="Play Button" width="80" height="75"/>
+        <image name="SettingsIcon" width="292" height="96"/>
         <image name="Video Thumbnail Loading Image" width="390" height="240"/>
     </resources>
 </document>
